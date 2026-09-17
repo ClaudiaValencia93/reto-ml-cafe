@@ -41,8 +41,9 @@ puntual falló por ~40% y en una sola dirección: no anticipó el shock de ofert
 |---|---|
 | Análisis de la información | [`notebooks/01_eda.ipynb`](notebooks/01_eda.ipynb) |
 | Solución a las problemáticas de negocio | [`02_modelado`](notebooks/02_modelado.ipynb) y [`03_precios`](notebooks/03_precios.ipynb) |
-| Implementación y evaluación | [`src/coffee/`](src/coffee/) + 64 pruebas en [`tests/`](tests/) |
+| Implementación y evaluación | [`src/coffee/`](src/coffee/) + 96 pruebas en [`tests/`](tests/) |
 | Presentación de resultados | Este README y los notebooks ejecutados |
+| **BONUS — IA generativa** | [`assistant/`](assistant/): auditor de plausibilidad, implementado y medido |
 
 ---
 
@@ -66,6 +67,7 @@ python src/coffee/data.py       # carga y limpieza + reporte de calidad
 python src/coffee/prices.py     # precios anuales por tipo de café
 python src/coffee/evaluate.py   # backtesting completo (~8 min)
 python src/coffee/price_forecast.py   # pronóstico de precios con intervalos
+python -m assistant.auditor     # auditor de plausibilidad + su evaluación
 ```
 
 Los datos de precios ya están versionados en `data/raw/`. Para actualizarlos:
@@ -89,12 +91,20 @@ src/coffee/
     evaluate.py        backtesting con origen móvil, MASE y segmentación
     price_forecast.py  pronóstico de precios con intervalos y validación
 
+assistant/             BONUS: auditor de plausibilidad con LLM
+    schema.py          contrato de salida y validación
+    prompts.py         prompt del auditor (sin filtrar el ground truth)
+    client.py          dos transportes: API en vivo y fixtures grabados
+    auditor.py         orquestación sobre los 53 países
+    evaluation.py      precisión, recall y calibración contra data.py
+    fixtures/          dictámenes grabados, reproducibles sin costo
+
 notebooks/
     01_eda.ipynb       análisis exploratorio y calidad del dato
     02_modelado.ipynb  comparación de modelos y la paradoja de composición
     03_precios.ipynb   rangos de precios futuros
 
-tests/                 64 pruebas sobre limpieza, métricas y modelos
+tests/                 96 pruebas sobre limpieza, métricas, modelos y auditor
 data/raw/              dataset original y series de precios, sin modificar
 reports/figures/       11 figuras generadas por los notebooks
 ```
@@ -247,6 +257,88 @@ hipótesis de mercado eficiente.
 **Lo accionable es el ancho de la banda.** A 12 meses el rango es de 1.4× y sirve para
 dimensionar contratos y coberturas. A tres años supera 3.5× y no sostiene decisiones de
 inversión. Acotar el rango de validez es parte del resultado.
+
+---
+
+## Bonus — auditor de plausibilidad con LLM
+
+El enunciado pide proponer cómo la IA generativa daría más valor a la solución.
+La respuesta obvia es un chatbot sobre los datos; la implementada es otra, y sale
+del propio análisis.
+
+### El problema que resuelve
+
+`data.py` puede detectar **que** una serie está plana: mide `flat_years_pct`. No
+puede decidir **si** eso es plausible, porque esa decisión exige información que no
+está en ninguna columna.
+
+Kenia registra 50,000 sacos idénticos durante 23 años. Saber que eso es imposible
+requiere saber que su población casi se duplicó en ese periodo, que se urbanizó y
+que desarrolló cultura de cafeterías. Ese es exactamente el tipo de conocimiento
+que un modelo de lenguaje aporta y una regla de conteo no.
+
+El LLM nunca calcula un número: recibe la serie y emite un juicio estructurado.
+
+```json
+{
+  "plausible": false,
+  "confidence": 0.92,
+  "pattern": "valor_arrastrado",
+  "reason": "La población de Kenia pasó de 23 a 52 millones entre 1990 y 2019..."
+}
+```
+
+### La evaluación es lo que lo convierte en ingeniería
+
+Al modelo **no se le entrega** `flat_years_pct` ni `data_quality`. Dárselos lo
+llevaría a repetir la conclusión del detector, y la medición posterior evaluaría
+copia en lugar de juicio. Una prueba dedicada falla si alguien filtra el ground
+truth al prompt.
+
+Resultado sobre los 39 países donde el detector determinista da veredicto claro
+(los `mixto` se excluyen por ambiguos):
+
+| Métrica | Valor |
+|---|---:|
+| Precisión | 95.5% |
+| Recall | 100% |
+| F1 | 97.7% |
+| Exactitud | 97.4% |
+
+La confianza declarada está calibrada: 86% de acierto en la banda baja (<0.70) y
+100% en las dos bandas superiores. El campo sirve para priorizar revisión manual.
+
+### El falso positivo, y por qué importa
+
+El único desacuerdo fue Bolivia, marcada como interpolada. Su justificación afirma
+que la serie crece *"sin un solo retroceso"*. La verificación contra los datos
+muestra una caída de 240,000 kg en 2005: **el argumento contiene un hecho falso**.
+
+Su segundo argumento —incrementos en múltiplos regulares de 30,000— tampoco
+distingue nada: Brasil, Etiopía, Indonesia y Filipinas también los tienen al 100%,
+y son los mercados mejor medidos del panel. Es consecuencia de que la ICO reporta
+en miles de sacos de 60 kg.
+
+Ese dictamen se lee como un argumento experto y es incorrecto. Sin la capa de
+evaluación habría pasado como válido.
+
+**Conclusión operativa:** el auditor detecta el 100% de los problemas con 95.5% de
+precisión, pero sus justificaciones pueden contener hechos fabricados aun cuando el
+veredicto sea razonable. No es un componente autónomo: genera candidatos para
+revisión humana, y la evaluación es obligatoria, no opcional.
+
+### Ejecución
+
+```bash
+python -m assistant.auditor          # reproduce dictámenes grabados, costo cero
+python -m assistant.auditor --live   # llama a la API (~0.39 USD)
+```
+
+Los dictámenes de `assistant/fixtures/` fueron generados por Claude Opus 5 y se
+reproducen desde disco, el patrón de *golden fixtures*. La ruta en vivo está
+implementada y verificada hasta el último paso —autenticación y enrutamiento por
+workspace funcionan— y se detiene únicamente en el control de saldo de la cuenta.
+No se ejecutó contra la API por no disponer de créditos.
 
 ---
 
