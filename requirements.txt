@@ -20,7 +20,7 @@ uvicorn==0.30.6
 pydantic==2.9.2
 
 # --- bonus GenAI ---
-anthropic==0.34.2
+anthropic==0.125.0
 
 # --- desarrollo ---
 jupyter==1.0.0
