@@ -17,3 +17,6 @@ reports/figures/*.png
 # SO
 Thumbs.db
 desktop.ini
+
+# artefactos de build (pip install -e)
+*.egg-info/
