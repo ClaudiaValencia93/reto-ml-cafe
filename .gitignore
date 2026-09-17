@@ -1,0 +1,19 @@
+# entorno
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# datos derivados (los crudos si se versionan)
+data/processed/*
+!data/processed/.gitkeep
+
+# artefactos
+models/*.pkl
+reports/figures/*.png
+.env
+
+# SO
+Thumbs.db
+desktop.ini

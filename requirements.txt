@@ -1,0 +1,27 @@
+# --- datos ---
+pandas==2.1.4
+numpy==1.26.4
+pyarrow==14.0.2
+
+# --- modelado ---
+scikit-learn==1.5.2
+statsmodels==0.14.1
+lightgbm==4.5.0
+
+# --- visualizacion ---
+matplotlib==3.8.4
+seaborn==0.13.2
+plotly==5.24.1
+
+# --- entrega ---
+streamlit==1.37.1
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.9.2
+
+# --- bonus GenAI ---
+anthropic==0.34.2
+
+# --- desarrollo ---
+jupyter==1.0.0
+pytest==8.3.3
