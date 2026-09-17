@@ -20,3 +20,6 @@ desktop.ini
 
 # artefactos de build (pip install -e)
 *.egg-info/
+
+# cache de pytest (se autoignora, pero se declara para que sea evidente)
+.pytest_cache/
