@@ -8,8 +8,8 @@ tienen miles de parámetros; ajustarlos con 30 puntos no produce un modelo, prod
 memorización. La literatura de forecasting es consistente en esto (competencias M3,
 M4 y M5): con series cortas, los métodos estadísticos simples ganan.
 
-La decisión no se defiende con esta cita, se defiende con el backtesting de
-`evaluate.py`: si un modelo complejo le ganara a los baselines, se usaría.
+El sustento no es la referencia sino el backtesting de `evaluate.py`: si un
+modelo complejo superara a los baselines, se adoptaría.
 
 CATÁLOGO
 --------

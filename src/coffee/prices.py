@@ -22,7 +22,7 @@ Descarga (sin API key):
 
 Se eligió el FMI sobre la ICO porque la serie del FMI es descargable de forma
 programática y sin registro, lo que mantiene el pipeline reproducible por
-quien evalúe este trabajo.
+terceros.
 
 COBERTURA
 ---------

@@ -31,9 +31,9 @@ cuantiles se preservan.
 EL EXPERIMENTO CENTRAL
 ----------------------
 El dataset de consumo termina en 2019/20, pero los precios llegan a julio de
-2026. Eso permite algo que casi ningún candidato va a hacer: entrenar hasta
-septiembre de 2019, pronosticar los ~82 meses siguientes, y **comparar contra la
-realidad**, que incluye el shock de precios de 2021-2024.
+2026. Eso habilita una validación poco frecuente: entrenar hasta septiembre de
+2019, pronosticar los ~82 meses siguientes y **comparar contra la realidad**,
+que incluye el shock de precios de 2021-2024.
 
 No es backtesting simulado. Es validación contra datos que el modelo nunca vio y
 que no son una partición artificial: son el futuro que efectivamente ocurrió.
