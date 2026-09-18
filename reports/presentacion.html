@@ -1028,10 +1028,21 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   <div class="figs">
     <div class="fig pos"><span class="n">100%</span><span class="k">recall: encontró los 21 problemas reales</span></div>
     <div class="fig pos"><span class="n">95,5%</span><span class="k">precisión</span></div>
-    <div class="fig"><span class="n">86%</span><span class="k">acierto verificado en la banda de confianza baja: 6 de 7 países evaluados. Las bandas altas, 100%</span></div>
+    <div class="fig"><span class="n">1</span><span class="k">falso positivo en 39 países</span></div>
   </div>
 
-  <p class="body">Esa última cifra mide dos cosas a la vez, y conviene no confundirlas. La <em>confianza</em> es lo que el modelo se asigna a sí mismo en cada dictamen; el <em>acierto</em> es cuántos resultaron correctos al contrastarlos con el detector determinista. Que el segundo caiga al 86% justo donde el primero baja significa que el auditor <strong>sabe cuándo no sabe</strong>: la confianza declarada sirve para priorizar qué revisar a mano, y no es decorativa.</p>
+  <h3>Calibración de la confianza</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Confianza que el modelo se asigna</th><th class="num">Países</th><th class="num">Acierto verificado</th></tr></thead>
+      <tbody>
+        <tr><td>hasta 0,70</td><td class="num">7</td><td class="num">86%</td></tr>
+        <tr><td>de 0,70 a 0,85</td><td class="num">20</td><td class="num">100%</td></tr>
+        <tr><td>sobre 0,85</td><td class="num">12</td><td class="num">100%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="body">El acierto cae solo donde la confianza declarada baja. Eso permite enviar a revisión manual únicamente la banda inferior, siete países de treinta y nueve.</p>
 
   <div class="note warn">
     <span class="h">El falso positivo importa más que el acierto</span>
