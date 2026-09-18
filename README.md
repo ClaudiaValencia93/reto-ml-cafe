@@ -62,7 +62,7 @@ La instalación editable (`-e`) registra el paquete `coffee` en el entorno, de m
 notebooks, pruebas y aplicaciones lo importan sin manipular `sys.path`.
 
 ```bash
-pytest                          # 64 pruebas, ~35 s
+pytest                          # 96 pruebas, ~40 s
 python src/coffee/data.py       # carga y limpieza + reporte de calidad
 python src/coffee/prices.py     # precios anuales por tipo de café
 python src/coffee/evaluate.py   # backtesting completo (~8 min)
@@ -305,8 +305,20 @@ Resultado sobre los 39 países donde el detector determinista da veredicto claro
 | F1 | 97.7% |
 | Exactitud | 97.4% |
 
-La confianza declarada está calibrada: 86% de acierto en la banda baja (<0.70) y
-100% en las dos bandas superiores. El campo sirve para priorizar revisión manual.
+La confianza declarada está calibrada. Agrupando los dictámenes por la confianza que
+el modelo se asignó a sí mismo, y contando cuántos resultaron correctos contra el
+detector:
+
+| Confianza declarada | Países | Acierto verificado |
+|---|---:|---:|
+| hasta 0,70 | 7 | **86%** (6 de 7) |
+| 0,70 a 0,85 | 20 | 100% |
+| sobre 0,85 | 12 | 100% |
+
+Son dos cosas distintas: la confianza es autoevaluación del modelo, el acierto es
+verificación contra el detector. Que el segundo caiga donde cae el primero significa
+que el auditor reconoce sus propios límites, y permite enviar a revisión manual solo
+la banda baja.
 
 ### El falso positivo, y por qué importa
 

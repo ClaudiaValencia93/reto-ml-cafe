@@ -610,7 +610,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       // grabada no es un fallo del codigo: un LLM no es una funcion pura, y por
       // eso el proyecto mide la calibracion en vez de confiar en un dictamen.
       var coincide = vivo.plausible === d.fx.p;
-      var confBaja = vivo.confidence < 0.7 || d.fx.n < 0.7;
+      var confBaja = vivo.confidence <= 0.7 || d.fx.n <= 0.7;
       var partes = [];
 
       partes.push(coincide
@@ -626,8 +626,8 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
           "Ojo con las dos cifras, que miden cosas distintas. <strong>" +
           vivo.confidence.toFixed(2) + "</strong> y <strong>" + d.fx.n +
           "</strong> son la confianza que el modelo se asigna a sí mismo en cada dictamen. " +
-          "El <strong>86%</strong> es acierto verificado: de todos los dictámenes que cayeron " +
-          "por debajo de 0,70, esa proporción resultó correcta al contrastarla con el detector " +
+          "El <strong>86%</strong> es acierto verificado: de los 7 dictámenes con confianza " +
+          "de 0,70 o menos, 6 resultaron correctos al contrastarlos con el detector " +
           "determinista, frente al 100% de las bandas altas. Que el acierto medido baje cuando " +
           "baja la confianza declarada es lo que hace utilizable este componente.");
       }

@@ -81,8 +81,13 @@ def calibracion(tabla):
     d = tabla[tabla.data_quality.isin(VERDAD)].copy()
     d["verdad_plausible"] = d.data_quality.map(VERDAD)
     d["acierta"] = d.plausible == d.verdad_plausible
+    # pd.cut genera intervalos cerrados por la derecha: (0, 0.70], (0.70, 0.85],
+    # (0.85, 1.00]. Las etiquetas lo dicen tal cual: cuatro paises caen
+    # exactamente en 0.70 y pertenecen a la banda baja, asi que rotularla
+    # "<0.70" haria que nadie pudiera reproducir el conteo.
     d["banda"] = pd.cut(d.confidence, [0, 0.7, 0.85, 1.0],
-                        labels=["baja (<0.70)", "media (0.70-0.85)", "alta (>0.85)"])
+                        labels=["baja (hasta 0.70)", "media (0.70 a 0.85)",
+                                "alta (sobre 0.85)"])
     return d.groupby("banda", observed=True).agg(
         n=("acierta", "size"), aciertos=("acierta", "sum"),
         tasa_acierto=("acierta", "mean"),
