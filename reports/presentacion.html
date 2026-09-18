@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Café: demanda y precio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -821,7 +825,20 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       revela(d, {plausible: d.fx.p, confidence: d.fx.n});
     }
 
-    claude.use("sample").then(function (sample) {
+    // `claude` solo existe cuando la pagina corre dentro del artefacto. Abierta
+    // como archivo del repositorio no existe, y sin esta guarda la referencia
+    // lanza y se lleva por delante el panel entero. Ambos casos —sin runtime y
+    // sin sesion— desembocan en la misma via: los dictamenes grabados.
+    var capacidad;
+    try {
+      capacidad = (typeof claude !== "undefined" && claude && claude.use)
+        ? claude.use("sample")
+        : Promise.resolve(null);
+    } catch (e) {
+      capacidad = Promise.resolve(null);
+    }
+
+    capacidad.catch(function () { return null; }).then(function (sample) {
       if (!sample) {
         // Sin sesion de Claude no hay llamada en vivo, pero la pagina sigue
         // siendo util: el selector funciona y se muestran los 53 grabados.
