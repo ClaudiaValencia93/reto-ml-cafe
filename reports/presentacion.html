@@ -287,6 +287,9 @@ button.ghost{background:transparent; color:var(--muted); border:1px solid var(--
 
 th.c2,td.c2{text-align:center; width:130px}
 
+.ense{display:block; margin-top:7px; font-size:.78rem;
+  font-style:italic; color:var(--muted); line-height:1.35}
+
 /* ---- callout ---- */
 .note{border-left:3px solid var(--green); padding:2px 0 2px 18px; color:var(--ink-2); max-width:64ch}
 .note.warn{border-left-color:var(--clay)}
@@ -906,12 +909,13 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     if (!cont || !D.length) return;
 
     // Elegidos por el caso que ilustran, no por su resultado.
+    // [clave en el dataset, nombre en español, clase, qué enseña]
     var SEL = [
-      ["Kenya", "", "el acierto claro"],
-      ["Viet Nam", "", "una serie legítima reconocida"],
-      ["Cuba", "", "razonamiento matizado"],
-      ["Gabon", "", "el modelo admite que no sabe"],
-      ["Bolivia (Plurinational State of)", "miss", "el único error"]
+      ["Kenya", "Kenia", "", "el acierto claro"],
+      ["Viet Nam", "Vietnam", "", "una serie legítima reconocida"],
+      ["Cuba", "Cuba", "", "razonamiento matizado"],
+      ["Gabon", "Gabón", "", "el modelo admite que no sabe"],
+      ["Bolivia (Plurinational State of)", "Bolivia", "miss", "el único error"]
     ];
 
     function esc(t) {
@@ -924,12 +928,13 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       var d = D.filter(function (x) { return x.c === p[0]; })[0];
       if (!d) return "";
       var ok = d.fx.p === true;
-      return '<div class="v-i ' + p[1] + '">' +
-        '<div><span class="v-c">' + esc(d.c.replace(" (Plurinational State of)", "")) + '</span>' +
+      return '<div class="v-i ' + p[2] + '">' +
+        '<div><span class="v-c">' + esc(p[1]) + '</span>' +
           '<div class="v-tags"><span class="tag ' + (ok ? "si" : "no") + '">' +
-            (ok ? "plausible" : "no plausible") + '</span>' +
+            (ok ? "plausible" : "no plausible") + '</span></div>' +
+          '<div class="v-tags"><span class="tag p">' + esc(d.fx.t) + '</span>' +
             '<span class="tag p">conf ' + d.fx.n.toFixed(2) + '</span></div>' +
-          '<span class="vpat">' + esc(p[2]) + '</span></div>' +
+          '<span class="ense">' + esc(p[3]) + '</span></div>' +
         '<div><div class="src"><span class="lb2">Calculado</span><p>' + esc(d.cf) + '</p></div>' +
         '<div class="src"><span class="lb2">Del modelo</span><p>' + esc(d.fx.r) + '</p></div></div>' +
         '</div>';
