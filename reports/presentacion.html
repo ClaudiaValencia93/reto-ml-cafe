@@ -622,7 +622,14 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       }
 
       if (confBaja) {
-        partes.push("Ambos dictámenes declaran confianza por debajo de 0,70, la banda donde el auditor acierta el <strong>86%</strong> de las veces frente al 100% de las bandas altas. La confianza baja está avisando de esto.");
+        partes.push(
+          "Ojo con las dos cifras, que miden cosas distintas. <strong>" +
+          vivo.confidence.toFixed(2) + "</strong> y <strong>" + d.fx.n +
+          "</strong> son la confianza que el modelo se asigna a sí mismo en cada dictamen. " +
+          "El <strong>86%</strong> es acierto verificado: de todos los dictámenes que cayeron " +
+          "por debajo de 0,70, esa proporción resultó correcta al contrastarla con el detector " +
+          "determinista, frente al 100% de las bandas altas. Que el acierto medido baje cuando " +
+          "baja la confianza declarada es lo que hace utilizable este componente.");
       }
 
       cmp.innerHTML = partes.join(" ");
@@ -810,10 +817,10 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   <div class="figs">
     <div class="fig pos"><span class="n">100%</span><span class="k">recall: encontró los 21 problemas reales</span></div>
     <div class="fig pos"><span class="n">95,5%</span><span class="k">precisión</span></div>
-    <div class="fig"><span class="n">86%</span><span class="k">acierto cuando declara confianza baja, frente a 100% en las bandas altas</span></div>
+    <div class="fig"><span class="n">86%</span><span class="k">acierto verificado en la banda de confianza declarada baja, frente a 100% en las altas</span></div>
   </div>
 
-  <p class="body">Esa última cifra importa: el auditor <strong>acierta más cuando dice estar más seguro</strong>. La confianza declarada sirve para priorizar qué revisar a mano, no es decorativa.</p>
+  <p class="body">Esa última cifra mide dos cosas a la vez, y conviene no confundirlas. La <em>confianza</em> es lo que el modelo se asigna a sí mismo en cada dictamen; el <em>acierto</em> es cuántos resultaron correctos al contrastarlos con el detector determinista. Que el segundo caiga al 86% justo donde el primero baja significa que el auditor <strong>sabe cuándo no sabe</strong>: la confianza declarada sirve para priorizar qué revisar a mano, y no es decorativa.</p>
 
   <div class="note warn">
     <span class="h">El falso positivo importa más que el acierto</span>
