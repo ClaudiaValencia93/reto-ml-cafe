@@ -563,7 +563,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 
 <section class="stack">
   <p class="eyebrow">06 — IA generativa</p>
-  <h2>Un auditor que juzga lo que una regla no puede</h2>
+  <h2>El juicio que una regla no puede emitir</h2>
 
   <p class="body">El código detecta <strong>que</strong> una serie está plana. No puede decidir <strong>si</strong> eso es plausible: esa decisión exige saber que la población de Kenia casi se duplicó, que Vietnam pasó de productor marginal a segundo exportador mundial, o que Zimbabue atravesó una hiperinflación. Nada de eso está en una columna del dataset.</p>
 
@@ -597,11 +597,11 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 <span class="k">}</span></pre>
   <p class="body">Cada respuesta se valida contra un esquema antes de usarse. Una confianza expresada como “alta” en vez de un número, o un patrón fuera del vocabulario, se rechaza y se registra — nunca se interpreta a medias.</p>
 
-  <h3>Pruébelo: audite cualquier país en vivo</h3>
+  <h3>Auditoría en vivo, país por país</h3>
   <div class="demo">
     <div class="demo-hd">
       <b>Auditor de plausibilidad</b>
-      <span>Llama a Claude en el momento · pide permiso la primera vez</span>
+      <span id="modo-lbl">Consulta a Claude en el momento</span>
     </div>
     <div class="demo-body">
       <div class="demo-row">
@@ -613,7 +613,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       <div class="spark"><svg id="spark" viewBox="0 0 600 42" preserveAspectRatio="none" aria-hidden="true"><path id="sparkp" d=""></path></svg></div>
       <p class="serie" id="serie"></p>
 
-      <div class="out" id="out"><p class="wait">Escoja un país y pulse <strong>Auditar</strong>. El modelo recibe solo el nombre del país y la serie — nunca la etiqueta de calidad contra la que después se le mide.</p></div>
+      <div class="out" id="out"><p class="wait">Al ejecutar la auditoría, el modelo recibe únicamente el nombre del país y su serie — nunca la etiqueta de calidad contra la que después se le mide.</p></div>
 
       <div class="truth" id="truth" hidden>
         <div><span class="lb">Detector determinista</span><span class="vl" id="t-q"></span></div>
@@ -623,7 +623,9 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       <p class="cmp" id="cmp" hidden></p>
     </div>
   </div>
-  <p class="body">Lo que corre aquí es el mismo prompt de <span class="mono">assistant/prompts.py</span>, con el reparto descrito arriba: el bloque <strong>Calculado</strong> lo produce el código y es incontestable; el bloque <strong>Del modelo</strong> viene de su memoria y se declara como tal.</p>
+  <p class="body">El prompt es el mismo de <span class="mono">assistant/prompts.py</span>, con el reparto descrito arriba: el bloque <strong>Calculado</strong> lo produce el código y es incontestable; el bloque <strong>Del modelo</strong> proviene de su memoria y se declara como tal.</p>
+
+  <p class="body">La consulta en vivo se ejecuta sobre la cuenta de Claude de quien abre la página y requiere una sesión iniciada. Sin ella, el panel muestra el dictamen grabado para cada país: los 53 están incrustados en el documento, de modo que la evaluación completa se puede recorrer sin red y sin cuenta.</p>
 
   <script>
   (function () {
@@ -644,6 +646,13 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     });
     var iKenya = D.findIndex(function (d) { return d.c === "Kenya"; });
     sel.value = iKenya < 0 ? 0 : iKenya;
+    var vivoDisponible = true;
+
+    function textoInicial() {
+      return vivoDisponible
+        ? "El botón <strong>Auditar</strong> consulta al modelo en este momento."
+        : "El botón <strong>Ver dictamen</strong> muestra el resultado grabado para este país.";
+    }
 
     function esc(t) {
       var e = document.createElement("span");
@@ -662,7 +671,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       }).join("  ·  ");
       truth.hidden = true;
       cmp.hidden = true;
-      out.innerHTML = '<p class="wait">Pulse <strong>Auditar</strong> para que el modelo juzgue esta serie.</p>';
+      out.innerHTML = '<p class="wait">' + textoInicial() + '</p>';
     }
     sel.addEventListener("change", pinta);
     pinta();
@@ -804,11 +813,25 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       return lineas.join("\n");
     }
 
+    // Muestra el dictamen grabado. Es la via que funciona SIEMPRE: los 53 estan
+    // incrustados en la pagina, sin red y sin sesion.
+    function muestraGrabado(d) {
+      out.innerHTML =
+        '<p class="wait">Dictamen grabado — la consulta en vivo requiere una sesión de Claude.</p>' +
+        tarjeta({plausible: d.fx.p, confidence: d.fx.n, pattern: d.fx.t, reason: d.fx.r}, d);
+      revela(d, {plausible: d.fx.p, confidence: d.fx.n});
+    }
+
     claude.use("sample").then(function (sample) {
       if (!sample) {
-        run.disabled = true;
-        sel.disabled = true;
-        out.innerHTML = '<p class="wait">La consulta en vivo no está disponible en esta vista. Los dictámenes grabados, y su evaluación, siguen más abajo.</p>';
+        // Sin sesion de Claude no hay llamada en vivo, pero la pagina sigue
+        // siendo util: el selector funciona y se muestran los 53 grabados.
+        vivoDisponible = false;
+        run.textContent = "Ver dictamen";
+        document.getElementById("modo-lbl").textContent =
+          "Dictámenes grabados · la consulta en vivo requiere sesión de Claude";
+        out.innerHTML = '<p class="wait">' + textoInicial() + '</p>';
+        run.addEventListener("click", function () { muestraGrabado(D[sel.value]); });
         return;
       }
 
@@ -858,7 +881,10 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
           }
           if (e.code === "not_granted" || e.code === "sampling_disabled"
               || e.code === "not_declared") {
-            run.disabled = true;
+            // Permiso denegado: se conserva la pagina util mostrando lo grabado.
+            vivoDisponible = false;
+            run.textContent = "Ver dictamen";
+            muestraGrabado(D[sel.value]);
             return;
           }
         }).then(function () {
@@ -912,7 +938,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   </div>
 
   <h3>Los 53 dictámenes, uno por uno</h3>
-  <p class="body">La evaluación entera es inspeccionable. Filtre por resultado y pulse cualquier fila: se despliegan las dos fuentes por separado, lo que calcula el código y lo que aporta el modelo.</p>
+  <p class="body">La evaluación entera es inspeccionable. Los filtros separan por resultado y cada fila se despliega para mostrar las dos fuentes por separado: lo que calcula el código y lo que aporta el modelo.</p>
 
   <div class="chips" id="chips">
     <button type="button" class="chip on" data-f="all">Todos <b>53</b></button>
