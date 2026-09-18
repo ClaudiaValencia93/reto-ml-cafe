@@ -140,8 +140,8 @@ def test_el_prompt_no_revela_el_detector_determinista():
     conclusión del detector y la evaluación mediría copia, no juicio.
     """
     p = user_prompt("Kenya", [1990, 1991], [50000, 50000], "Arabica")
-    prohibido = ["flat_years_pct", "data_quality", "arrastrado", "medido",
-                 "años planos", "sin cambio", "% plano"]
+    prohibido = ["flat_years_pct", "data_quality", "repetido", "parcial",
+                 "medido", "arrastrado", "años planos", "sin cambio", "% plano"]
     for termino in prohibido:
         assert termino not in p, f"el prompt filtra el ground truth: {termino!r}"
 
@@ -164,22 +164,22 @@ def _tabla(filas):
 
 def test_matriz_de_confusion_cuenta_bien():
     tabla = _tabla([
-        {"country": "A", "plausible": False, "data_quality": "arrastrado"},  # TP
+        {"country": "A", "plausible": False, "data_quality": "repetido"},  # TP
         {"country": "B", "plausible": True, "data_quality": "medido"},       # TN
         {"country": "C", "plausible": False, "data_quality": "medido"},      # FP
-        {"country": "D", "plausible": True, "data_quality": "arrastrado"},   # FN
+        {"country": "D", "plausible": True, "data_quality": "repetido"},   # FN
     ])
     cm = matriz_confusion(tabla)
     assert (cm["tp"], cm["tn"], cm["fp"], cm["fn"]) == (1, 1, 1, 1)
 
 
 def test_los_ambiguos_quedan_fuera_del_calculo():
-    """Los 'mixto' no son verdad ni mentira para el detector; incluirlos
+    """Los 'parcial' no son verdad ni mentira para el detector; incluirlos
     premiaría o penalizaría al auditor por algo indefinido."""
     tabla = _tabla([
-        {"country": "A", "plausible": False, "data_quality": "arrastrado"},
-        {"country": "B", "plausible": True, "data_quality": "mixto"},
-        {"country": "C", "plausible": False, "data_quality": "mixto"},
+        {"country": "A", "plausible": False, "data_quality": "repetido"},
+        {"country": "B", "plausible": True, "data_quality": "parcial"},
+        {"country": "C", "plausible": False, "data_quality": "parcial"},
     ])
     assert matriz_confusion(tabla)["n"] == 1
 

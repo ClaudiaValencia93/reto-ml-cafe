@@ -56,7 +56,7 @@ def run(panel=None, live=False, verbose=True):
         print(f"Modo: {cliente.modo} | países: {panel.country.nunique()}")
         if cliente.modo == "fixture":
             print(f"Fuente: {cliente.meta.get('generated_by', '?')} "
-                  f"(prompt {cliente.meta.get('prompt_version', '?')})\n")
+                f"(prompt {cliente.meta.get('prompt_version', '?')})\n")
 
     filas, incidencias = [], []
     for pais, anios, valores, tipo in series_por_pais(panel):
@@ -74,7 +74,7 @@ def run(panel=None, live=False, verbose=True):
         print(f"Dictámenes válidos: {len(dictamenes)} | incidencias: {len(incidencias)}")
         if cliente.modo == "live":
             print(f"Tokens: {cliente.tokens_entrada:,} entrada / "
-                  f"{cliente.tokens_salida:,} salida")
+                f"{cliente.tokens_salida:,} salida")
             print(f"Costo real: ${cliente.costo_usd:.4f} USD")
 
     return dictamenes, incidencias
@@ -114,7 +114,7 @@ def main():
     print("=" * 78)
     print(tabla.pattern.value_counts().to_string())
     print(f"\nPlausibles: {int(tabla.plausible.sum())} | "
-          f"No plausibles: {int((~tabla.plausible).sum())}")
+        f"No plausibles: {int((~tabla.plausible).sum())}")
     print(f"Confianza mediana: {tabla.confidence.median():.2f}")
 
     print("\n" + "=" * 78)

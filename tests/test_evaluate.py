@@ -136,7 +136,7 @@ def test_flat_years_pct_cuenta_anios_sin_cambio():
 def test_quality_tier_respeta_los_umbrales():
     assert quality_tier(0) == "medido"
     assert quality_tier(39.9) == "medido"
-    assert quality_tier(40) == "mixto"
-    assert quality_tier(69.9) == "mixto"
-    assert quality_tier(70) == "arrastrado"
-    assert quality_tier(100) == "arrastrado"
+    assert quality_tier(40) == "parcial"
+    assert quality_tier(69.9) == "parcial"
+    assert quality_tier(70) == "repetido"
+    assert quality_tier(100) == "repetido"

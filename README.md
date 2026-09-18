@@ -153,8 +153,8 @@ Cada país recibe `flat_years_pct` (porcentaje de años sin ningún cambio) y un
 | Nivel | Criterio | Países |
 |---|---|---|
 | medido | < 40% de años planos | 18 |
-| mixto | 40% – 70% | 14 |
-| arrastrado | > 70% | 21 |
+| parcial | 40% – 70% | 14 |
+| repetido | > 70% | 21 |
 
 Es un atributo y no un filtro porque el análisis de mercado es válido para los 55
 países, mientras que las métricas de pronóstico solo son interpretables dentro de cada
@@ -200,7 +200,7 @@ lo estorba.
 | naive | 1.50 | — |
 | global_lgbm | 1.89 | 38.5% |
 
-En los países arrastrados el modelo trivial obtiene MASE 0.00 y MAPE 0.00%: la serie es
+En los países repetidos el modelo trivial obtiene MASE 0.00 y MAPE 0.00%: la serie es
 constante por construcción, así que acertarla es trivial. Son esos ceros los que
 invierten el resultado agregado.
 
@@ -209,8 +209,8 @@ invierten el resultado agregado.
 | Segmento | Modelo | Razón |
 |---|---|---|
 | medido (18 países) | drift | MASE 0.76, supera al trivial en 70% de los casos |
-| mixto (14) | naive o ARIMA | prácticamente equivalentes |
-| arrastrado (21) | naive | óptimo por construcción |
+| parcial (14) | naive o ARIMA | prácticamente equivalentes |
+| repetido (21) | naive | óptimo por construcción |
 
 ---
 
@@ -296,7 +296,7 @@ copia en lugar de juicio. Una prueba dedicada falla si alguien filtra el ground
 truth al prompt.
 
 Resultado sobre los 39 países donde el detector determinista da veredicto claro
-(los `mixto` se excluyen por ambiguos):
+(los `parcial` se excluyen por ambiguos):
 
 | Métrica | Valor |
 |---|---:|
@@ -344,7 +344,7 @@ No se ejecutó contra la API por no disponer de créditos.
 
 ## Limitaciones
 
-1. **Para los 21 países arrastrados, cualquier cifra proyectada no es un pronóstico**
+1. **Para los 21 países repetidos, cualquier cifra proyectada no es un pronóstico**
    sino la repetición de un valor que la ICO ya venía repitiendo. Presentarla como
    proyección sería falsa precisión.
 2. Los años cafeteros 1990/91 y 1991/92 no tienen precio disponible: la serie del FMI

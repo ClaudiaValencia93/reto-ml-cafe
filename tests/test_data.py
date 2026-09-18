@@ -153,7 +153,7 @@ def test_los_paises_marcados_coinciden_con_el_reporte(limpio):
 def test_calidad_del_dato_se_etiqueta(limpio):
     df, _ = limpio
     assert {"flat_years_pct", "data_quality"} <= set(df.columns)
-    assert set(df.data_quality.unique()) <= {"medido", "mixto", "arrastrado"}
+    assert set(df.data_quality.unique()) <= {"medido", "parcial", "repetido"}
     # una etiqueta por país, constante dentro de la serie
     assert (df.groupby("country").data_quality.nunique() == 1).all()
 
@@ -164,7 +164,7 @@ def test_kenia_queda_marcada_como_arrastrada(limpio):
     df, _ = limpio
     kenya = df[df.country == "Kenya"]
     assert not kenya.is_low_variance.any(), "el filtro viejo NO la detecta"
-    assert kenya.data_quality.iloc[0] == "arrastrado", "el nuevo criterio sí"
+    assert kenya.data_quality.iloc[0] == "repetido", "el nuevo criterio sí"
     assert kenya.flat_years_pct.iloc[0] > 80
 
 

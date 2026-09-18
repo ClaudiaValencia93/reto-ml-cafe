@@ -1,0 +1,473 @@
+<title>Café: demanda y precio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --ink:#1C1815;
+  --ink-2:#4A423B;
+  --muted:#7A716A;
+  --paper:#F5F3EE;
+  --surface:#FFFFFF;
+  --line:#DED7CC;
+  --green:#2E5C4E;
+  --green-soft:#E3EDE8;
+  --clay:#A8422F;
+  --clay-soft:#F5E4E0;
+  --gold:#8A6A1F;
+  --shadow:rgba(28,24,21,.07);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#F0EBE4; --ink-2:#C4BBB1; --muted:#8E857C;
+    --paper:#16130F; --surface:#1F1B17; --line:#332C25;
+    --green:#7FBBA4; --green-soft:#1E3129;
+    --clay:#E08B77; --clay-soft:#38211C;
+    --gold:#D4AC52; --shadow:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#F0EBE4; --ink-2:#C4BBB1; --muted:#8E857C;
+  --paper:#16130F; --surface:#1F1B17; --line:#332C25;
+  --green:#7FBBA4; --green-soft:#1E3129;
+  --clay:#E08B77; --clay-soft:#38211C;
+  --gold:#D4AC52; --shadow:rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Source Sans 3",system-ui,-apple-system,sans-serif;
+  font-size:16px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:20px; padding-block:0}
+
+h1,h2,h3{font-family:Fraunces,Georgia,serif; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.1rem,6vw,3.4rem); line-height:1.05; font-weight:600; letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,4vw,2.1rem); line-height:1.15; font-weight:600; letter-spacing:-.01em}
+h3{font-size:1.06rem; font-weight:600; line-height:1.3}
+p{margin:0}
+
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
+}
+
+section{border-top:1px solid var(--line); padding-block:clamp(44px,7vw,72px)}
+section:first-of-type{border-top:0}
+.stack{display:flex; flex-direction:column; gap:22px}
+.stack-tight{display:flex; flex-direction:column; gap:12px}
+.lede{font-size:1.14rem; color:var(--ink-2); max-width:62ch}
+.body{max-width:66ch; color:var(--ink-2)}
+.body + .body{margin-top:14px}
+strong{color:var(--ink); font-weight:600}
+
+/* ---- cover ---- */
+.cover{padding-block:clamp(52px,9vw,96px) clamp(40px,6vw,64px)}
+.cover h1{margin-block:18px 20px}
+.meta{
+  display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted);
+  font-size:.86rem; font-family:"IBM Plex Mono",monospace;
+}
+
+/* ---- figures row ---- */
+.figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.fig{background:var(--surface); padding:18px 16px; display:flex; flex-direction:column; gap:3px}
+.fig .n{font-family:Fraunces,serif; font-size:1.9rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
+.fig .k{font-size:.8rem; color:var(--muted); line-height:1.35}
+.fig.pos .n{color:var(--green)}
+.fig.neg .n{color:var(--clay)}
+
+/* ---- charts ---- */
+figure{margin:0; background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:20px 18px 16px}
+figcaption{font-size:.84rem; color:var(--muted); margin-top:12px; line-height:1.5}
+svg{display:block; width:100%; height:auto; max-width:100%; overflow:visible}
+.ax{stroke:var(--line); stroke-width:1}
+.grid{stroke:var(--line); stroke-width:1; stroke-dasharray:2 4}
+.lbl{font-family:"IBM Plex Mono",monospace; font-size:10px; fill:var(--muted)}
+.lbl-c{font-family:"Source Sans 3",sans-serif; font-size:10.5px; fill:var(--ink-2)}
+.dot-g{fill:var(--green)} .dot-c{fill:var(--clay)} .dot-n{fill:var(--muted)}
+.bar-g{fill:var(--green)} .bar-c{fill:var(--clay)} .bar-n{fill:var(--muted)}
+
+/* ---- tables ---- */
+.tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:3px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:420px}
+th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:400}
+/* el encabezado se alinea con su columna: numerico a la derecha, texto a la izquierda */
+th.num,td.num{text-align:right}
+td.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+th.wide{width:40%}
+tr.hl td{background:var(--green-soft)}
+tr.hl td:first-child{font-weight:600}
+
+/* ---- rangos proyectados: el ancho de la barra ES el dato ---- */
+.ranges{border:1px solid var(--line); border-radius:3px; background:var(--surface); overflow:hidden}
+.rhead,.rrow{
+  display:grid;
+  grid-template-columns:62px 116px minmax(120px,1fr) 168px;
+  gap:16px; align-items:center; padding:11px 16px;
+}
+.rhead{
+  border-bottom:1px solid var(--line); color:var(--muted);
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem;
+  letter-spacing:.09em; text-transform:uppercase;
+}
+.rrow{border-bottom:1px solid var(--line)}
+.rrow:last-of-type{border-bottom:0}
+.rrow.live{background:var(--green-soft)}
+.rrow.live .ry{font-weight:600}
+.ry{font-family:"IBM Plex Mono",monospace}
+.rn{font-size:.92rem; white-space:nowrap}
+
+.rbar{position:relative; height:17px; background:var(--paper); border-radius:2px}
+.rbar i{position:absolute; top:0; bottom:0; background:var(--green); border-radius:2px; opacity:.8}
+.rbar i.weak{background:var(--clay); opacity:.42}
+.rbar b{
+  position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  font-size:.72rem; font-weight:500; color:var(--ink); mix-blend-mode:normal;
+}
+.ru{font-size:.9rem}
+.ru.ok{color:var(--ink-2)}
+.ru.no{color:var(--muted)}
+
+.rscale{
+  display:flex; justify-content:space-between; margin:0;
+  padding:7px 16px 10px; border-top:1px solid var(--line);
+  font-size:.68rem; color:var(--muted);
+}
+
+@media (max-width:620px){
+  .rhead{display:none}
+  .rrow{grid-template-columns:58px 1fr; gap:4px 12px; padding:13px 14px}
+  .rbar{grid-column:1 / -1; margin-top:5px}
+  .ru{grid-column:1 / -1; font-size:.85rem}
+}
+
+/* ---- glosario de modelos ---- */
+.gloss{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.gloss div{background:var(--surface); padding:13px 15px; display:flex; flex-direction:column; gap:3px}
+.gloss dt{font-family:"IBM Plex Mono",monospace; font-size:.82rem; color:var(--ink); font-weight:500; margin:0}
+.gloss dd{margin:0; font-size:.86rem; color:var(--ink-2); line-height:1.45}
+
+/* ---- callout ---- */
+.note{border-left:3px solid var(--green); padding:2px 0 2px 18px; color:var(--ink-2); max-width:64ch}
+.note.warn{border-left-color:var(--clay)}
+.note .h{display:block; color:var(--ink); font-weight:600; margin-bottom:5px}
+
+/* ---- archetypes ---- */
+.arch{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px}
+.arch-i{background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:16px; display:flex; flex-direction:column; gap:7px}
+.arch-i .rate{font-family:"IBM Plex Mono",monospace; font-size:1.3rem; font-variant-numeric:tabular-nums}
+.arch-i .who{font-size:.85rem; color:var(--muted); line-height:1.45}
+.up .rate{color:var(--green)} .down .rate{color:var(--clay)} .flat .rate{color:var(--gold)}
+
+/* ---- recommendations ---- */
+.recs{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.rec{background:var(--surface); padding:16px 18px; display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start}
+.rec .idx{font-family:"IBM Plex Mono",monospace; color:var(--green); font-size:.86rem; padding-top:2px}
+.rec .t{font-weight:600; display:block; margin-bottom:3px}
+.rec .d{font-size:.92rem; color:var(--ink-2)}
+
+footer{border-top:1px solid var(--line); padding-block:30px 44px; color:var(--muted); font-size:.85rem}
+footer a{color:var(--green)}
+@media (prefers-reduced-motion:no-preference){a{transition:opacity .15s}}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-offset:2px}
+</style>
+
+<div class="wrap">
+
+<section class="cover">
+  <p class="eyebrow">Reto técnico · Ingeniería de machine learning</p>
+  <h1>Café: dónde crece la demanda y qué precio esperar</h1>
+  <p class="lede">Análisis del consumo doméstico de café en 55 países entre 1990 y 2019, con proyección de rangos de precio internacional hasta 2029. Preparado para <strong>High Garden Coffee</strong>, exportadora internacional.</p>
+  <p class="meta"><span>55 países · 30 años cafeteros</span><span>96 pruebas automatizadas</span><span>Fuentes: ICO · FMI</span></p>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">01 — El mercado</p>
+  <h2>Crece de forma sostenida, y está concentrado en siete países</h2>
+
+  <div class="figs">
+    <div class="fig pos"><span class="n">+156%</span><span class="k">consumo mundial 1990–2019</span></div>
+    <div class="fig"><span class="n">3,3%</span><span class="k">crecimiento anual compuesto</span></div>
+    <div class="fig"><span class="n">7</span><span class="k">países explican el 80%</span></div>
+    <div class="fig"><span class="n">44%</span><span class="k">del total es solo Brasil</span></div>
+  </div>
+
+  <p class="body">El consumo pasó de 1,17 a 3,00 miles de millones de kilogramos en tres décadas, sin quiebres estructurales. Es un mercado en expansión estable — pero el promedio esconde lo decisivo: <strong>dónde</strong> ocurre ese crecimiento.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 330" role="img" aria-label="Dispersión de crecimiento anual frente a volumen de consumo en 2019">
+      <line class="ax" x1="86" y1="288" x2="686" y2="288"/>
+      <line class="ax" x1="86" y1="25" x2="86" y2="288"/>
+
+      <line class="grid" x1="86" y1="61" x2="686" y2="61"/><text class="lbl" x="80" y="65" text-anchor="end">+10%</text>
+      <line class="grid" x1="86" y1="124" x2="686" y2="124"/><text class="lbl" x="80" y="128" text-anchor="end">+5%</text>
+      <line x1="86" y1="186" x2="686" y2="186" stroke="var(--ink-2)" stroke-width="1" opacity=".45"/>
+      <text class="lbl" x="80" y="190" text-anchor="end">0%</text>
+      <line class="grid" x1="86" y1="249" x2="686" y2="249"/><text class="lbl" x="80" y="253" text-anchor="end">−5%</text>
+
+      <text class="lbl" x="199" y="303" text-anchor="middle">0,1</text>
+      <text class="lbl" x="309" y="303" text-anchor="middle">1</text>
+      <text class="lbl" x="418" y="303" text-anchor="middle">10</text>
+      <text class="lbl" x="528" y="303" text-anchor="middle">100</text>
+      <text class="lbl" x="637" y="303" text-anchor="middle">1.000</text>
+      <text class="lbl" x="386" y="322" text-anchor="middle">consumo 2019 · millones de kg · escala logarítmica</text>
+      <text class="lbl" x="-156" y="14" transform="rotate(-90)" text-anchor="middle">crecimiento anual compuesto</text>
+
+      <circle class="dot-g" cx="392" cy="43" r="5"/><text class="lbl-c" x="403" y="47">Tanzania</text>
+      <circle class="dot-g" cx="550" cy="56" r="5"/><text class="lbl-c" x="540" y="60" text-anchor="end">Vietnam</text>
+      <circle class="dot-g" cx="519" cy="96" r="5"/><text class="lbl-c" x="509" y="100" text-anchor="end">Tailandia</text>
+      <circle class="dot-g" cx="429" cy="105" r="5"/><text class="lbl-c" x="419" y="109" text-anchor="end">Nicaragua</text>
+      <circle class="dot-g" cx="559" cy="120" r="5"/><text class="lbl-c" x="570" y="118">Filipinas</text>
+      <circle class="dot-g" cx="578" cy="126" r="5"/><text class="lbl-c" x="589" y="136">Indonesia</text>
+      <circle class="dot-g" cx="438" cy="130" r="5"/><text class="lbl-c" x="428" y="134" text-anchor="end">Uganda</text>
+      <circle class="dot-g" cx="567" cy="136" r="5"/><text class="lbl-c" x="557" y="146" text-anchor="end">Etiopía</text>
+      <circle class="dot-g" cx="650" cy="142" r="6.5"/><text class="lbl-c" x="639" y="146" text-anchor="end">Brasil</text>
+      <circle class="dot-n" cx="546" cy="161" r="5"/><text class="lbl-c" x="557" y="159">México</text>
+      <circle class="dot-n" cx="537" cy="169" r="5"/><text class="lbl-c" x="527" y="178" text-anchor="end">Colombia</text>
+      <circle class="dot-n" cx="521" cy="171" r="5"/><text class="lbl-c" x="532" y="180">India</text>
+      <circle class="dot-c" cx="413" cy="222" r="5"/><text class="lbl-c" x="403" y="226" text-anchor="end">Ecuador</text>
+      <circle class="dot-c" cx="111" cy="242" r="5"/><text class="lbl-c" x="122" y="246">Togo</text>
+      <circle class="dot-c" cx="208" cy="275" r="5"/><text class="lbl-c" x="219" y="279">Ghana</text>
+    </svg>
+    <figcaption>Cada punto es un país. Arriba a la izquierda están los mercados que crecen rápido sin ser grandes todavía; a la derecha, los que ya tienen escala. <strong>Vietnam multiplicó su consumo doméstico por 17</strong> y Tanzania crece al 11,5% anual: ninguno está entre los tres mayores consumidores.</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="h">Implicación comercial</span>
+    Una estrategia basada en volumen absoluto se reduce a “vender en Brasil”, que es una descripción, no una decisión. El valor está en los mercados donde el crecimiento es más rápido que el del mercado mundial.
+  </div>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">02 — Segmentación</p>
+  <h2>Cuatro arquetipos de mercado</h2>
+  <p class="body">Agrupando los países por la <strong>forma</strong> de su trayectoria —normalizada a base 100 para que el tamaño no domine— aparecen cuatro comportamientos con lecturas comerciales distintas.</p>
+
+  <div class="arch">
+    <div class="arch-i up"><h3>Despegue</h3><span class="rate mono">+9,5% anual</span><span class="who">Vietnam · Tanzania · Nicaragua</span><span class="who">Prioridad de expansión. Base pequeña, crecimiento excepcional.</span></div>
+    <div class="arch-i up"><h3>Crecimiento sostenido</h3><span class="rate mono">+3,2% anual</span><span class="who">Brasil · Etiopía · Indonesia · Filipinas · Tailandia · Uganda</span><span class="who">El segmento más valioso: combina escala con expansión.</span></div>
+    <div class="arch-i flat"><h3>Estancados</h3><span class="rate mono">0,0% anual</span><span class="who">Colombia · México · India · Perú · Guatemala · Kenia</span><span class="who">Mercados maduros o saturados. Consumo plano 30 años.</span></div>
+    <div class="arch-i down"><h3>Contracción</h3><span class="rate mono">−3,6% anual</span><span class="who">Ghana · Gabón · Rep. Centroafricana · Sri Lanka</span><span class="who">En retirada sostenida. Descartar como objetivo.</span></div>
+  </div>
+
+  <p class="body">Colombia aparece en el grupo estancado: su consumo doméstico lleva tres décadas plano pese a ser productor de primer nivel.</p>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">03 — Calidad del dato</p>
+  <h2>La mitad del panel no son mediciones</h2>
+
+  <p class="body">Kenia registra <span class="mono">50.000</span> sacos <strong>idénticos durante 23 años consecutivos</strong>. No es estabilidad: es el último valor conocido, arrastrado por el organismo estadístico cuando el país deja de reportar.</p>
+
+  <div class="figs">
+    <div class="fig"><span class="n">62%</span><span class="k">mediana de años sin variación alguna</span></div>
+    <div class="fig"><span class="n">18</span><span class="k">de 55 países con medición continua</span></div>
+    <div class="fig neg"><span class="n">23</span><span class="k">años seguidos con el mismo valor en Kenia</span></div>
+  </div>
+
+  <p class="body">Los países se clasifican en tres niveles según el porcentaje de años sin cambio: <strong>medido</strong> (18), <strong>parcial</strong> (14) y <strong>repetido</strong> (21). Es un atributo medido, no un filtro que elimina países: el análisis de mercado sigue siendo válido para todos, pero las métricas de pronóstico solo son interpretables dentro de cada nivel.</p>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">04 — Modelado</p>
+  <h2>Evaluar todos los países juntos daba el resultado contrario</h2>
+
+  <p class="body">Evaluado sobre el panel completo, el modelo trivial —repetir el último valor— parecía ganar. Segmentando por calidad del dato, el resultado se invierte.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 300" role="img" aria-label="Error MASE por modelo en países medidos frente a países arrastrados">
+      <text class="lbl-c" x="20" y="18" style="font-weight:600">Países con medición real (18)</text>
+      <line class="ax" x1="20" y1="132" x2="330" y2="132"/>
+      <line class="grid" x1="130" y1="30" x2="130" y2="132"/>
+      <text class="lbl" x="130" y="146" text-anchor="middle">1,0 = trivial</text>
+
+      <rect class="bar-g" x="20" y="34" width="84" height="15" rx="1"/>
+      <text class="lbl-c" x="112" y="46">drift · 0,76</text>
+      <rect class="bar-g" x="20" y="55" width="92" height="15" rx="1"/>
+      <text class="lbl-c" x="120" y="67">arima · 0,84</text>
+      <rect class="bar-g" x="20" y="76" width="108" height="15" rx="1"/>
+      <text class="lbl-c" x="136" y="88">ets · 0,98</text>
+      <rect class="bar-n" x="20" y="97" width="165" height="15" rx="1"/>
+      <text class="lbl-c" x="193" y="109">naive · 1,50</text>
+      <rect class="bar-c" x="20" y="118" width="208" height="15" rx="1" style="opacity:.55"/>
+      <text class="lbl-c" x="236" y="130">lightgbm · 1,89</text>
+
+      <text class="lbl-c" x="380" y="18" style="font-weight:600">Países con dato repetido (12)</text>
+      <line class="ax" x1="380" y1="132" x2="690" y2="132"/>
+      <line class="grid" x1="490" y1="30" x2="490" y2="132"/>
+      <text class="lbl" x="490" y="146" text-anchor="middle">1,0 = trivial</text>
+
+      <rect class="bar-n" x="380" y="34" width="2" height="15" rx="1"/>
+      <text class="lbl-c" x="390" y="46">naive · 0,00</text>
+      <rect class="bar-n" x="380" y="55" width="2" height="15" rx="1"/>
+      <text class="lbl-c" x="390" y="67">arima · 0,00</text>
+      <rect class="bar-c" x="380" y="76" width="88" height="15" rx="1" style="opacity:.55"/>
+      <text class="lbl-c" x="476" y="88">lightgbm · 0,80</text>
+      <rect class="bar-c" x="380" y="97" width="135" height="15" rx="1"/>
+      <text class="lbl-c" x="523" y="109">drift · 1,23</text>
+      <rect class="bar-c" x="380" y="118" width="143" height="15" rx="1"/>
+      <text class="lbl-c" x="531" y="130">ets · 1,30</text>
+
+      <text class="lbl-c" x="20" y="190" style="font-weight:600">Lo que produce la inversión</text>
+      <text class="lbl" x="20" y="212">En las series repetidas el modelo trivial acierta con error exactamente 0,00%,</text>
+      <text class="lbl" x="20" y="228">porque la serie es constante por construcción. Esos ceros arrastran la mediana</text>
+      <text class="lbl" x="20" y="244">global y esconden que, donde hay medición real, el naive queda cuarto de cinco.</text>
+      <text class="lbl" x="20" y="272">Barra más corta = menor error. La línea punteada marca al modelo trivial.</text>
+    </svg>
+    <figcaption>Evaluación con origen móvil: 13 cortes temporales × 43 países × 6 modelos = 3.156 pronósticos, cada uno entrenado solo con datos anteriores al año predicho.</figcaption>
+  </figure>
+
+  <dl class="gloss">
+    <div><dt>naive</dt><dd>Repite el último valor conocido. Es la barra a superar, no un relleno.</dd></div>
+    <div><dt>drift</dt><dd>Extiende la tendencia media de toda la serie hacia adelante.</dd></div>
+    <div><dt>arima</dt><dd>Modela la inercia: cuánto arrastra cada año al siguiente.</dd></div>
+    <div><dt>ets</dt><dd>Pondera más los años recientes, con la tendencia amortiguada.</dd></div>
+    <div><dt>lightgbm</dt><dd>Machine learning entrenado sobre los 43 países a la vez.</dd></div>
+  </dl>
+
+  <div class="note">
+    <span class="h">Por qué no se usó deep learning</span>
+    Cada país aporta como máximo 30 observaciones anuales. Se implementó el enfoque de machine learning más razonable disponible —un modelo global tipo LightGBM entrenado sobre los 43 países a la vez, sobre tasas de crecimiento logarítmicas— y quedó en <span class="mono">1,89</span> frente a <span class="mono">0,76</span> de una recta ajustada por dos puntos. La decisión se sustenta en medición, no en preferencia.
+  </div>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">05 — Precios</p>
+  <h2>El rango acierta; el número no</h2>
+
+  <p class="body">La base entregada no contiene ninguna variable de precio: sus columnas son consumo en kilogramos. La brecha se cubre con las series del Fondo Monetario Internacional para Arábica y Robusta, mensuales desde 1992.</p>
+
+  <p class="body">El modelo se entrenó <strong>hasta septiembre de 2019</strong> y se validó contra los 82 meses posteriores, que nunca vio — incluyendo el shock de oferta de 2021–2024.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 290" role="img" aria-label="Pronóstico de precio del Arábica contra lo que realmente ocurrió">
+      <line class="ax" x1="58" y1="238" x2="686" y2="238"/>
+      <line class="ax" x1="58" y1="18" x2="58" y2="238"/>
+      <text class="lbl" x="52" y="242" text-anchor="end">0</text>
+      <line class="grid" x1="58" y1="175" x2="686" y2="175"/><text class="lbl" x="52" y="179" text-anchor="end">200</text>
+      <line class="grid" x1="58" y1="112" x2="686" y2="112"/><text class="lbl" x="52" y="116" text-anchor="end">400</text>
+      <line class="grid" x1="58" y1="49" x2="686" y2="49"/><text class="lbl" x="52" y="53" text-anchor="end">600</text>
+      <text class="lbl" x="-128" y="14" transform="rotate(-90)" text-anchor="middle">centavos USD / libra</text>
+
+      <path d="M330 191 L686 28 L686 230 Z" fill="var(--green)" opacity=".13"/>
+      <path d="M330 191 L686 103 L686 225 Z" fill="var(--green)" opacity=".2"/>
+      <path d="M330 191 L686 197" stroke="var(--green)" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+
+      <path d="M58 215 L74 170 L90 186 L105 155 L120 181 L146 221 L166 214 L187 202 L217 190 L233 176 L248 144 L263 162 L278 169 L299 190 L314 186 L330 191"
+            fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
+      <path d="M330 191 L381 182 L432 155 L457 168 L483 171 L534 166 L560 148 L585 125 L610 109 L636 127 L660 136 L686 125"
+            fill="none" stroke="var(--clay)" stroke-width="2.4"/>
+
+      <line x1="330" y1="18" x2="330" y2="238" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity=".5"/>
+      <text class="lbl" x="326" y="14" text-anchor="end">fin del entrenamiento · sep 2019</text>
+
+      <text class="lbl" x="62" y="252">1992</text>
+      <text class="lbl" x="330" y="252" text-anchor="middle">2019</text>
+      <text class="lbl" x="686" y="252" text-anchor="end">2026</text>
+
+      <rect x="60" y="264" width="20" height="3" fill="var(--ink-2)"/><text class="lbl-c" x="86" y="270">histórico</text>
+      <rect x="160" y="264" width="20" height="3" fill="var(--clay)"/><text class="lbl-c" x="186" y="270">lo que ocurrió</text>
+      <rect x="290" y="262" width="20" height="7" fill="var(--green)" opacity=".2"/><text class="lbl-c" x="316" y="270">intervalo 80%</text>
+      <rect x="420" y="262" width="20" height="7" fill="var(--green)" opacity=".13"/><text class="lbl-c" x="446" y="270">intervalo 95%</text>
+    </svg>
+    <figcaption>La línea roja se sale de la banda del 80% pero nunca de la del 95%.</figcaption>
+  </figure>
+
+  <div class="figs">
+    <div class="fig neg"><span class="n">41,8%</span><span class="k">error del pronóstico puntual</span></div>
+    <div class="fig pos"><span class="n">100%</span><span class="k">de la realidad cayó dentro del intervalo 95%</span></div>
+    <div class="fig"><span class="n">70,7%</span><span class="k">cobertura del intervalo 80% (nominal: 80%)</span></div>
+  </div>
+
+  <p class="body">El sesgo coincide con el error, lo que significa que el modelo se quedó corto en casi todos los meses: no anticipó la subida. Las heladas en Brasil, la sequía en Vietnam y el alza de fletes no están contenidas en la serie histórica de precios.</p>
+
+  <h3>Rangos proyectados — Arábica</h3>
+  <div class="ranges">
+    <div class="rhead">
+      <span>Horizonte</span><span>Rango 80% · centavos/libra</span><span class="rspan">Amplitud del intervalo</span><span>Uso</span>
+    </div>
+
+    <div class="rrow live">
+      <span class="ry">2026</span>
+      <span class="rn mono">314 – 446</span>
+      <div class="rbar"><i style="left:23%;width:24.4%"></i><b class="mono">1,4×</b></div>
+      <span class="ru ok">Contratos y coberturas</span>
+    </div>
+    <div class="rrow">
+      <span class="ry">2027</span>
+      <span class="rn mono">257 – 546</span>
+      <div class="rbar"><i style="left:12.4%;width:53.5%"></i><b class="mono">2,1×</b></div>
+      <span class="ru ok">Planeación indicativa</span>
+    </div>
+    <div class="rrow">
+      <span class="ry">2028</span>
+      <span class="rn mono">216 – 649</span>
+      <div class="rbar"><i class="weak" style="left:4.8%;width:80.2%"></i><b class="mono">3,0×</b></div>
+      <span class="ru no">No accionable</span>
+    </div>
+    <div class="rrow">
+      <span class="ry">2029</span>
+      <span class="rn mono">194 – 721</span>
+      <div class="rbar"><i class="weak" style="left:0.7%;width:97.6%"></i><b class="mono">3,7×</b></div>
+      <span class="ru no">No accionable</span>
+    </div>
+
+    <p class="rscale mono"><span>190</span><span>730 centavos/libra</span></p>
+  </div>
+
+  <div class="note warn">
+    <span class="h">Límite de validez</span>
+    El pronóstico es útil a <strong>12 meses</strong>. A tres años el rango supera 3,5× y no sostiene decisiones de inversión. Acotar ese límite es parte del resultado, no una salvedad al margen.
+  </div>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">06 — IA generativa</p>
+  <h2>Un auditor que juzga lo que una regla no puede</h2>
+
+  <p class="body">El código detecta <strong>que</strong> una serie está plana. No puede decidir <strong>si</strong> eso es plausible: esa decisión exige saber que la población de Kenia casi se duplicó, que Vietnam pasó de productor marginal a segundo exportador mundial, o que Zimbabue atravesó una hiperinflación. Nada de eso está en una columna del dataset.</p>
+
+  <p class="body">Un modelo de lenguaje recibe la serie cruda —<strong>nunca la métrica de calidad</strong>, para que la evaluación no sea circular— y emite un dictamen estructurado que después se mide contra el detector determinista.</p>
+
+  <div class="figs">
+    <div class="fig pos"><span class="n">100%</span><span class="k">recall: encontró los 21 problemas reales</span></div>
+    <div class="fig pos"><span class="n">95,5%</span><span class="k">precisión</span></div>
+    <div class="fig"><span class="n">1</span><span class="k">falso positivo en 39 países</span></div>
+  </div>
+
+  <div class="note warn">
+    <span class="h">El falso positivo importa más que el acierto</span>
+    El auditor marcó Bolivia como interpolada argumentando que la serie crece “sin un solo retroceso”. La verificación muestra una caída de 240.000 kg en 2005: <strong>el argumento contiene un hecho falso</strong>. Su segundo argumento tampoco distingue nada — Brasil, Etiopía e Indonesia comparten la misma regularidad y son los mercados mejor medidos del panel.
+    <br><br>
+    El dictamen se lee como un análisis experto y es incorrecto. Sin la capa de evaluación habría pasado como válido. <strong>El auditor genera candidatos para revisión humana, no veredictos autónomos.</strong>
+  </div>
+</section>
+
+<section class="stack">
+  <p class="eyebrow">07 — Recomendaciones</p>
+  <h2>Qué hacer con esto</h2>
+
+  <div class="recs">
+    <div class="rec"><span class="idx">01</span><span><span class="t">Priorizar el segmento de crecimiento sostenido</span><span class="d">Brasil, Etiopía, Indonesia, Filipinas, Tailandia y Uganda son los únicos que combinan escala con expansión por encima del 3% anual. Es donde el volumen y el crecimiento coinciden.</span></span></div>
+    <div class="rec"><span class="idx">02</span><span><span class="t">Vigilar Vietnam y Tanzania como apuestas de expansión</span><span class="d">Crecen a más del triple del mercado mundial desde bases todavía pequeñas. Entrar temprano cuesta menos que disputar un mercado maduro.</span></span></div>
+    <div class="rec"><span class="idx">03</span><span><span class="t">Descartar los mercados en contracción</span><span class="d">Ghana, Togo, Gabón y Sri Lanka llevan tres décadas de caída sostenida. No hay señal de reversión.</span></span></div>
+    <div class="rec"><span class="idx">04</span><span><span class="t">Fijar coberturas a 12 meses, no a tres años</span><span class="d">El rango de precio a un año (1,4×) permite dimensionar contratos. Más allá, la incertidumbre hace que cualquier cifra puntual sea falsa precisión.</span></span></div>
+    <div class="rec"><span class="idx">05</span><span><span class="t">No reportar proyecciones para 21 países</span><span class="d">En los mercados con dato repetido, cualquier cifra entregada repetiría un valor que el organismo ya venía repitiendo. Marcarlos explícitamente como no proyectables.</span></span></div>
+    <div class="rec"><span class="idx">06</span><span><span class="t">Incorporar variables exógenas al modelo de precio</span><span class="d">Inventarios certificados, clima en zonas productoras, tipo de cambio del real y costos de flete. El shock de 2021–2024 fue de oferta, y la oferta no está en la serie de precios.</span></span></div>
+  </div>
+</section>
+
+<footer class="stack-tight">
+  <p><strong>Fuentes.</strong> Consumo doméstico: International Coffee Organization, años cafeteros 1990/91–2019/20. Precios: International Monetary Fund, <em>Primary Commodity Prices</em>, vía <a href="https://fred.stlouisfed.org/series/PCOFFOTMUSDM">FRED</a>.</p>
+  <p><strong>Nota sobre unidades.</strong> La base se describe “en tazas”, pero la verificación contra la ICO muestra que son kilogramos derivados de miles de sacos de 60 kg: Brasil 1990/91 aparece con 492.000.000 y la ICO reporta 8.200 miles de sacos, donde 8.200 × 60.000 = 492.000.000 exacto.</p>
+</footer>
+
+</div>

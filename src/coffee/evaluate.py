@@ -239,7 +239,7 @@ def by_horizon(resultados):
     return resultados.groupby("model")[cols].median().round(2)
 
 
-TIER_ORDER = ["medido", "mixto", "arrastrado"]
+TIER_ORDER = ["medido", "parcial", "repetido"]
 
 
 def attach_quality(resultados, panel):
@@ -260,7 +260,7 @@ def summarize_by_tier(resultados, panel=None):
     Esta es la tabla que importa, y la razón es una paradoja de composición.
 
     Agregando los 43 países, el naive parece ganar. Pero en los países cuyo
-    consumo es un valor arrastrado por la ICO, el naive acierta con error
+    consumo es un valor repetido por la ICO, el naive acierta con error
     EXACTAMENTE cero, porque la serie es constante por construcción. Esos ceros
     arrastran la mediana global y esconden que, en los países con medición real,
     los modelos con tendencia le ganan al naive con holgura.

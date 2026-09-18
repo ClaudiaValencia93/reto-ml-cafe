@@ -19,7 +19,7 @@ auditor es *detectar problemas*:
     precisión  de lo que el auditor marcó como problema, cuánto lo era
     recall     de los problemas reales, cuántos encontró
 
-Los países `mixto` quedan fuera del cálculo y se reportan aparte: el propio
+Los países `parcial` quedan fuera del cálculo y se reportan aparte: el propio
 detector determinista los considera ambiguos, así que usarlos como verdad
 penalizaría o premiaría al auditor por acertar algo que no está definido.
 
@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 
 # El detector determinista solo da veredicto claro en los extremos.
-VERDAD = {"medido": True, "arrastrado": False}
+VERDAD = {"medido": True, "repetido": False}
 
 
 def matriz_confusion(tabla):
@@ -99,12 +99,12 @@ def report(tabla):
     print("=" * 78)
     print("Ground truth: data_quality de src/coffee/data.py (el modelo nunca lo vio).")
     print("Clase positiva: 'no es medicion real'.")
-    print(f"Se evaluan {cm['n']} paises; los 'mixto' se excluyen por ambiguos.\n")
+    print(f"Se evaluan {cm['n']} paises; los 'parcial' se excluyen por ambiguos.\n")
 
-    print("                       auditor dice")
-    print("                    problema  | correcto")
-    print(f"  real: arrastrado     {cm['tp']:3}     |   {cm['fn']:3}")
-    print(f"  real: medido         {cm['fp']:3}     |   {cm['tn']:3}")
+    print("                      auditor dice")
+    print("                   problema  | correcto")
+    print(f"  real: repetido  {cm['tp']:6}     | {cm['fn']:6}")
+    print(f"  real: medido    {cm['fp']:6}     | {cm['tn']:6}")
 
     print(f"\n  precision : {m['precision']:.1%}")
     print(f"  recall    : {m['recall']:.1%}")

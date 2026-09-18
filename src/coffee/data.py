@@ -55,7 +55,7 @@ LOW_VARIANCE_MAX_DISTINCT = 3  # <= este numero de valores distintos = sospechos
 # -----------------------------------
 # Un "año plano" es aquel en que el consumo es EXACTAMENTE igual al del año
 # anterior. Un cero repetido en las diferencias no es una medición: es el
-# último valor conocido arrastrado por la ICO cuando el país no reporta.
+# último valor conocido repetido por la ICO cuando el país no reporta.
 #
 # La mediana del panel es 55% de años planos, y hay países con 89%. El criterio
 # de LOW_VARIANCE_MAX_DISTINCT solo detecta los casos extremos (Kenia tiene 6
@@ -67,7 +67,7 @@ LOW_VARIANCE_MAX_DISTINCT = 3  # <= este numero de valores distintos = sospechos
 # países, mientras que las métricas de pronóstico solo son interpretables dentro
 # de cada nivel de calidad. Mezclarlos invierte la conclusión: ver
 # `evaluate.summarize_by_tier`.
-FLAT_TIER_BOUNDS = (40, 70)  # (% plano) -> medido | mixto | arrastrado
+FLAT_TIER_BOUNDS = (40, 70)  # (% plano) -> medido | parcial | repetido
 
 # Total_domestic_consumption es la suma exacta de los 30 anios. Si sobrevive
 # al formato largo es FUGA DE INFORMACION: le da al modelo el futuro.
@@ -139,8 +139,8 @@ def quality_tier(pct):
     if pct < bajo:
         return "medido"
     if pct < alto:
-        return "mixto"
-    return "arrastrado"
+        return "parcial"
+    return "repetido"
 
 
 def _nonzero_bounds(s):
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     print()
     calidad = df.groupby("data_quality").country.nunique()
     print("Calidad del dato (% de años sin cambio alguno):")
-    for nivel in ("medido", "mixto", "arrastrado"):
+    for nivel in ("medido", "parcial", "repetido"):
         if nivel in calidad.index:
             print(f"  {nivel:12} {calidad[nivel]:2} países")
     print(f"  mediana de años planos en el panel: "
