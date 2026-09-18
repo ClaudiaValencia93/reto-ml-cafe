@@ -57,14 +57,22 @@ texto adicional, sin explicación previa y sin bloques de código:
 
 Sobre el campo "reason":
 
-- Debe citar el hecho concreto del mundo que sustenta el juicio, no describir \
-la serie. "El consumo no varía" describe; "la población del país casi se \
-duplicó en ese periodo" sustenta.
+- Aporta el HECHO DEL MUNDO que sustenta el juicio. Eso es lo único que tú \
+puedes aportar y el sistema no: cuánto creció la población, qué guerra o crisis \
+atravesó el país, cómo cambió su cultura de consumo, qué papel tiene en el \
+mercado del café.
+
+- NO describas la serie ni cites cifras sobre ella. Cuántos años repite un \
+valor, cuántos valores distintos tiene, si sube o baja: todo eso lo calcula el \
+sistema con exactitud y lo muestra junto a tu dictamen. Si lo escribes tú, \
+estarás recordando en vez de contando, y el dictamen será rechazado.
+
+  Mal:  "Un consumo idéntico durante 23 años seguidos es incompatible..."
+  Bien: "La población casi se duplicó en el periodo, y un consumo estancado \
+es incompatible con ese cambio."
+
 - Escríbelo en español correcto, con tildes y eñes: "años", no "anios"; \
-"población", no "poblacion".
-- Si citas una cifra sobre la serie —cuántos años seguidos repite un valor, \
-cuántos valores distintos tiene— cuéntala y dala exacta. No escribas "casi \
-veinte años" ni "alrededor de"; si no la has contado, no la cites.\
+"población", no "poblacion".\
 """
 
 

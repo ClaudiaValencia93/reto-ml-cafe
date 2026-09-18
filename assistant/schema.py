@@ -13,6 +13,7 @@ Todo dictamen que no cumpla este contrato se rechaza y se registra, nunca se
 adivina ni se repara a medias.
 """
 
+import re
 from dataclasses import asdict, dataclass
 from typing import Any, Dict
 
@@ -26,6 +27,31 @@ PATRONES = {
 }
 
 MAX_RAZON = 600  # caracteres; corta respuestas desbordadas sin truncar silencio
+
+# El modelo NO debe citar cifras sobre la serie: no las cuenta, las recuerda, y
+# ahí es donde falla. Esas cifras las calcula `series_facts.py` y se muestran
+# junto al dictamen. Cada patrón de abajo corresponde a un error real detectado
+# en la primera corrida:
+#
+#   "casi veinte años"          -> eran dieciséis
+#   "sin un solo retroceso"     -> hay uno, en 2005
+#   "constante durante todo el periodo" -> 23 de 30 años
+#
+# Prohibirlos no es pedirle más cuidado al modelo: es sacar de su trabajo la
+# tarea que hace mal, y dejarle la que hace bien.
+CLAIMS_DE_SERIE = [
+    (re.compile(r"\bsacos?\b", re.I),
+     "menciona la unidad de la serie; las cifras de la serie las calcula el código"),
+    (re.compile(r"\d+\s+valores\s+distintos", re.I),
+     "cuenta valores distintos"),
+    (re.compile(r"\d+\s+a[ñn]os?\s+(?:consecutivos|seguidos)", re.I),
+     "cuenta años consecutivos"),
+    (re.compile(r"sin\s+(?:un\s+solo\s+)?retroceso", re.I),
+     "afirma ausencia de retrocesos"),
+    (re.compile(r"(?:constante|id[ée]ntic[oa])[^.]{0,40}"
+                r"(?:todo\s+el\s+periodo|treinta\s+a[ñn]os|tres\s+d[ée]cadas)", re.I),
+     "describe la extensión de una racha"),
+]
 
 
 class VerdictError(ValueError):
@@ -79,6 +105,14 @@ def validate(payload: Dict[str, Any], country: str) -> Verdict:
         raise VerdictError(f"{country}: 'reason' vacío o no textual")
     if len(reason) > MAX_RAZON:
         raise VerdictError(f"{country}: 'reason' excede {MAX_RAZON} caracteres ({len(reason)})")
+
+    for patron, motivo in CLAIMS_DE_SERIE:
+        m = patron.search(reason)
+        if m:
+            raise VerdictError(
+                f"{country}: la justificación invade el territorio del código "
+                f"({motivo}): {m.group(0)!r}"
+            )
 
     return Verdict(
         country=country,

@@ -138,17 +138,11 @@ def _racha_maxima(y):
     return mejor
 
 
-# Justificaciones cuyas afirmaciones sobre la serie NO se sostienen. Se dejan
-# tal cual en el fixture a propósito: son la salida real del modelo, y
-# corregirlas falsearía la evaluación. Se documentan, no se maquillan.
-#
-#   Bolivia — afirma que la serie crece "sin un solo retroceso"; cae 240.000 kg
-#             en 2005. Además su veredicto es el único falso positivo.
-#   Rwanda  — la llama "constante de mil sacos durante todo el periodo"; 1.000
-#             aparece en 23 de 30 años, junto a 333, 2.000 y 3.000. El veredicto
-#             sí es correcto (la serie está repetida): lo que falla es el grado
-#             de la afirmación, no la conclusión.
-CLAIMS_CONTRADICHAS = {"Bolivia (Plurinational State of)", "Rwanda"}
+# En v2 ninguna justificación puede contradecir la serie, porque ninguna habla
+# de la serie: ese territorio es del código (`series_facts.py`). Las tres
+# afirmaciones falsas de v1 quedan preservadas en `reason_v1` para que la
+# revisión sea auditable.
+CLAIMS_CONTRADICHAS = set()
 
 
 def _contradicciones(fixture, panel):
@@ -188,18 +182,50 @@ def test_ninguna_justificacion_nueva_contradice_su_serie(fixture, panel):
     assert not nuevas, f"justificaciones con afirmaciones contradichas por los datos: {sorted(nuevas)}"
 
 
-def test_las_contradicciones_conocidas_siguen_ahi(fixture, panel):
-    """Si desaparecen, es que alguien editó el fixture para maquillar la salida
-    del modelo — y eso invalidaría toda la evaluación."""
-    assert _contradicciones(fixture, panel) == CLAIMS_CONTRADICHAS
+def test_ninguna_justificacion_invade_el_territorio_del_codigo(fixture):
+    """El reparto se hace cumplir, no se pide amablemente.
+
+    `validate()` rechaza cualquier dictamen que cite cifras de la serie. Esta
+    prueba lo comprueba sobre las 53 justificaciones publicadas.
+    """
+    from assistant.schema import CLAIMS_DE_SERIE
+
+    invasiones = []
+    for v in fixture["verdicts"]:
+        for patron, motivo in CLAIMS_DE_SERIE:
+            m = patron.search(v["reason"])
+            if m:
+                invasiones.append(f"{v['country']}: {motivo} ({m.group(0)!r})")
+    assert not invasiones, "\n".join(invasiones)
 
 
-def test_el_veredicto_de_rwanda_es_correcto_aunque_su_texto_exagere(auditoria):
-    """Separar el grado de la afirmación de la conclusión: Rwanda acierta."""
+def test_la_revision_conserva_el_texto_original(fixture):
+    """Trazabilidad de la revisión: qué decía antes cada justificación."""
+    for v in fixture["verdicts"]:
+        assert v.get("reason_v1"), f"{v['country']}: falta el texto de v1"
+        assert v["reason_v1"] != v["reason"], f"{v['country']}: la revisión no cambió nada"
+
+
+def test_las_afirmaciones_falsas_de_v1_quedan_documentadas(fixture, panel):
+    """La v1 contenía afirmaciones que los datos desmienten. Se conservan para
+    que la revisión sea auditable: borrarlas ocultaría el motivo del cambio."""
+    v1 = {v["country"]: dict(v, reason=v["reason_v1"]) for v in fixture["verdicts"]}
+    contradicciones = _contradicciones({"verdicts": list(v1.values())}, panel)
+    assert {"Bolivia (Plurinational State of)", "Rwanda"} <= contradicciones
+
+
+def test_la_revision_no_toco_ningun_veredicto(auditoria):
+    """Lo único que se reescribió es la prosa. Si un veredicto hubiera cambiado,
+    las métricas publicadas dejarían de ser las de la corrida evaluada."""
     r = auditoria[auditoria.country == "Rwanda"].iloc[0]
     assert r.data_quality == "repetido"
     # `bool(...)`: pandas devuelve numpy.bool_, y `is False` fallaría siendo falso
-    assert bool(r.plausible) is False, "el veredicto es correcto"
+    assert bool(r.plausible) is False
+    assert r.confidence == 0.85
+
+    b = auditoria[auditoria.country.str.startswith("Bolivia")].iloc[0]
+    assert bool(b.plausible) is False and b.pattern == "interpolado"
+    assert b.confidence == 0.66, "sigue siendo el mismo falso positivo"
 
 
 # ===================================================================

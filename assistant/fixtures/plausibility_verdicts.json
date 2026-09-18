@@ -1,7 +1,7 @@
 {
   "meta": {
     "generated_by": "claude-opus-5",
-    "prompt_version": "auditor-plausibilidad-v1",
+    "prompt_version": "auditor-plausibilidad-v2",
     "inputs_given_to_model": [
       "country",
       "coffee_type",
@@ -14,7 +14,8 @@
     ],
     "withholding_rationale": "Entregar el detector determinista al modelo haria que lo repitiera, y la evaluacion posterior mediria copia en vez de juicio. El modelo solo ve la serie cruda y el nombre del pais.",
     "n_countries": 53,
-    "note": "Dictamenes generados por Claude Opus 5 y grabados como golden fixture. La ruta --live llama a la API y esta verificada hasta el control de saldo de la cuenta."
+    "note": "Dictamenes generados por Claude Opus 5 y grabados como golden fixture. La ruta --live llama a la API y esta verificada hasta el control de saldo de la cuenta.",
+    "revision": "v2 reparte territorios: el codigo describe la serie (series_facts.py) y el modelo aporta solo el hecho del mundo. Las justificaciones se reescribieron sin cifras de serie y con ortografia correcta; el texto original de cada una se conserva en 'reason_v1'. NINGUN veredicto cambio -plausible, pattern y confidence son los de v1-, de modo que precision, recall y calibracion son identicas. La v1 contenia tres afirmaciones sobre la serie que los datos desmienten; en v2 ese tipo de afirmacion esta prohibido por el prompt y rechazado por el validador de schema.py."
   },
   "verdicts": [
     {
@@ -22,371 +23,424 @@
       "plausible": false,
       "confidence": 0.92,
       "pattern": "valor_arrastrado",
-      "reason": "La poblacion de Kenia paso de unos 23 a 52 millones entre 1990 y 2019, con fuerte urbanizacion y aparicion de cadenas de cafeterias urbanas desde los 2000. Un consumo identico durante 23 anios consecutivos es incompatible con ese cambio; el movimiento solo aparece al final, cuando el organismo actualizo la estimacion."
+      "reason": "La población de Kenia pasó de unos 23 a 52 millones entre 1990 y 2019, con una urbanización acelerada y la aparición de cadenas de cafeterías desde los 2000. Un consumo doméstico estancado es incompatible con esa transformación.",
+      "reason_v1": "La poblacion de Kenia paso de unos 23 a 52 millones entre 1990 y 2019, con fuerte urbanizacion y aparicion de cadenas de cafeterias urbanas desde los 2000. Un consumo identico durante 23 anios consecutivos es incompatible con ese cambio; el movimiento solo aparece al final, cuando el organismo actualizo la estimacion."
     },
     {
       "country": "Democratic Republic of Congo",
       "plausible": false,
       "confidence": 0.9,
       "pattern": "valor_arrastrado",
-      "reason": "La poblacion pasó de unos 35 a 87 millones y el pais atraveso dos guerras y el colapso de su sector cafetero. Ninguno de esos choques deja una serie constante; la ausencia total de variacion indica que no hubo reporte anual."
+      "reason": "La población pasó de unos 35 a 87 millones, y el país atravesó dos guerras y el colapso de su sector cafetero. Ninguno de esos choques deja una demanda interna inmóvil: la ausencia de variación apunta a que no hubo reporte anual.",
+      "reason_v1": "La poblacion pasó de unos 35 a 87 millones y el pais atraveso dos guerras y el colapso de su sector cafetero. Ninguno de esos choques deja una serie constante; la ausencia total de variacion indica que no hubo reporte anual."
     },
     {
       "country": "Nigeria",
       "plausible": false,
       "confidence": 0.9,
       "pattern": "valor_arrastrado",
-      "reason": "La poblacion nigeriana paso de unos 95 a 200 millones en el periodo, con expansion de clase media urbana y del mercado de cafe soluble. Un consumo con solo dos o tres valores distintos en tres decadas no puede recoger eso."
+      "reason": "La población nigeriana pasó de unos 95 a 200 millones, con una expansión notable de la clase media urbana y del mercado de café soluble. Una demanda interna sin evolución no puede recoger un cambio de esa magnitud.",
+      "reason_v1": "La poblacion nigeriana paso de unos 95 a 200 millones en el periodo, con expansion de clase media urbana y del mercado de cafe soluble. Un consumo con solo dos o tres valores distintos en tres decadas no puede recoger eso."
     },
     {
       "country": "Peru",
       "plausible": false,
       "confidence": 0.88,
       "pattern": "valor_arrastrado",
-      "reason": "Peru es un productor de primer nivel cuya poblacion crecio de 22 a 33 millones, con crecimiento economico sostenido desde 2002 y desarrollo de cafeterias urbanas en Lima. Una serie casi constante es incompatible con esa trayectoria."
+      "reason": "Perú es un productor de primer nivel cuya población creció de 22 a 33 millones, con crecimiento económico sostenido desde 2002 y un mercado de cafeterías en Lima que se desarrolló en ese periodo. Una demanda interna inmóvil no es compatible con esa trayectoria.",
+      "reason_v1": "Peru es un productor de primer nivel cuya poblacion crecio de 22 a 33 millones, con crecimiento economico sostenido desde 2002 y desarrollo de cafeterias urbanas en Lima. Una serie casi constante es incompatible con esa trayectoria."
     },
     {
       "country": "Haiti",
       "plausible": false,
       "confidence": 0.85,
       "pattern": "valor_arrastrado",
-      "reason": "Haiti sufrio el embargo de los noventa, el terremoto de 2010 y crisis politicas recurrentes, ademas del colapso de su produccion cafetera. Una serie sin variacion no refleja ninguno de esos choques."
+      "reason": "Haití sufrió el embargo de los noventa, el terremoto de 2010 y crisis políticas recurrentes, además del colapso de su producción cafetera. Una demanda interna que no registra ninguno de esos choques no parece medida.",
+      "reason_v1": "Haiti sufrio el embargo de los noventa, el terremoto de 2010 y crisis politicas recurrentes, ademas del colapso de su produccion cafetera. Una serie sin variacion no refleja ninguno de esos choques."
     },
     {
       "country": "Zimbabwe",
       "plausible": false,
       "confidence": 0.87,
       "pattern": "valor_arrastrado",
-      "reason": "Zimbabue vivio la reforma agraria de 2000, hiperinflacion hasta 2009 y la dolarizacion posterior, con caida drastica del ingreso real. Un consumo de cafe constante a traves de ese periodo no es creible como medicion."
+      "reason": "Zimbabue vivió la reforma agraria de 2000, una hiperinflación que se prolongó hasta 2009 y la dolarización posterior, con una caída drástica del ingreso real. El consumo de un bien no esencial no puede atravesar ese periodo sin inmutarse.",
+      "reason_v1": "Zimbabue vivio la reforma agraria de 2000, hiperinflacion hasta 2009 y la dolarizacion posterior, con caida drastica del ingreso real. Un consumo de cafe constante a traves de ese periodo no es creible como medicion."
     },
     {
       "country": "Rwanda",
       "plausible": false,
       "confidence": 0.85,
       "pattern": "valor_arrastrado",
-      "reason": "Ruanda atraveso el genocidio de 1994 y luego dos decadas de crecimiento economico rapido, con una politica deliberada de cafe de especialidad. Un valor constante de mil sacos durante todo el periodo no recoge ni el colapso ni la recuperacion."
+      "reason": "Ruanda atravesó el genocidio de 1994 y luego dos décadas de crecimiento económico rápido, con una política deliberada de café de especialidad. Una demanda interna que no recoge ni el colapso ni la recuperación posterior no refleja lo ocurrido.",
+      "reason_v1": "Ruanda atraveso el genocidio de 1994 y luego dos decadas de crecimiento economico rapido, con una politica deliberada de cafe de especialidad. Un valor constante de mil sacos durante todo el periodo no recoge ni el colapso ni la recuperacion."
     },
     {
       "country": "Côte d'Ivoire",
       "plausible": false,
       "confidence": 0.85,
       "pattern": "valor_arrastrado",
-      "reason": "Costa de Marfil duplico su poblacion y atraveso una guerra civil entre 2002 y 2011 que desorganizo su sector cafetero. La serie tiene solo tres valores distintos, con un salto abrupto que parece una revision administrativa y no una evolucion."
+      "reason": "Costa de Marfil duplicó su población y atravesó una guerra civil entre 2002 y 2011 que desorganizó su sector cafetero. El salto abrupto que muestra la serie encaja mejor con una revisión administrativa de la estimación que con una evolución del consumo.",
+      "reason_v1": "Costa de Marfil duplico su poblacion y atraveso una guerra civil entre 2002 y 2011 que desorganizo su sector cafetero. La serie tiene solo tres valores distintos, con un salto abrupto que parece una revision administrativa y no una evolucion."
     },
     {
       "country": "Liberia",
       "plausible": false,
       "confidence": 0.85,
       "pattern": "valor_arrastrado",
-      "reason": "Liberia atraveso dos guerras civiles entre 1989 y 2003 y la epidemia de ebola de 2014, con destruccion de su capacidad estadistica. Una serie constante durante ese periodo indica ausencia de reporte, no estabilidad del consumo."
+      "reason": "Liberia atravesó dos guerras civiles entre 1989 y 2003 y la epidemia de ébola de 2014, que destruyeron buena parte de su capacidad estadística. La inmovilidad de la cifra indica ausencia de reporte, no estabilidad del consumo.",
+      "reason_v1": "Liberia atraveso dos guerras civiles entre 1989 y 2003 y la epidemia de ebola de 2014, con destruccion de su capacidad estadistica. Una serie constante durante ese periodo indica ausencia de reporte, no estabilidad del consumo."
     },
     {
       "country": "Sierra Leone",
       "plausible": false,
       "confidence": 0.82,
       "pattern": "valor_arrastrado",
-      "reason": "La guerra civil de 1991 a 2002 y el ebola de 2014 desarticularon la economia y las estadisticas del pais. Un consumo sin variacion a traves de esos anios no es una medicion plausible."
+      "reason": "La guerra civil de 1991 a 2002 y el ébola de 2014 desarticularon la economía y el aparato estadístico del país. Una demanda interna que no acusa ninguno de los dos episodios no resulta creíble como medición.",
+      "reason_v1": "La guerra civil de 1991 a 2002 y el ebola de 2014 desarticularon la economia y las estadisticas del pais. Un consumo sin variacion a traves de esos anios no es una medicion plausible."
     },
     {
       "country": "Angola",
       "plausible": false,
       "confidence": 0.82,
       "pattern": "valor_arrastrado",
-      "reason": "Angola fue un gran productor de cafe hasta que la guerra civil, que termino en 2002, destruyo el sector; despues vivio el auge y la caida del petroleo. Una serie casi plana no recoge ninguno de esos ciclos."
+      "reason": "Angola fue un gran productor de café hasta que la guerra civil, terminada en 2002, destruyó el sector; después vivió el auge y la caída del petróleo. Una demanda interna que no recoge ninguno de esos ciclos no parece observada.",
+      "reason_v1": "Angola fue un gran productor de cafe hasta que la guerra civil, que termino en 2002, destruyo el sector; despues vivio el auge y la caida del petroleo. Una serie casi plana no recoge ninguno de esos ciclos."
     },
     {
       "country": "Paraguay",
       "plausible": false,
       "confidence": 0.8,
       "pattern": "valor_arrastrado",
-      "reason": "La poblacion paraguaya paso de unos 4.2 a 7 millones con crecimiento sostenido del ingreso. Ademas el consumo local se orienta a la yerba mate y al terere, pero aun asi una cifra identica durante casi todo el periodo indica estimacion arrastrada."
+      "reason": "La población paraguaya pasó de unos 4.2 a 7 millones con un crecimiento sostenido del ingreso. El consumo local se orienta sobre todo a la yerba mate y al tereré, lo que explicaría un nivel bajo, pero no que la cifra permanezca inmóvil durante décadas.",
+      "reason_v1": "La poblacion paraguaya paso de unos 4.2 a 7 millones con crecimiento sostenido del ingreso. Ademas el consumo local se orienta a la yerba mate y al terere, pero aun asi una cifra identica durante casi todo el periodo indica estimacion arrastrada."
     },
     {
       "country": "Panama",
       "plausible": false,
       "confidence": 0.8,
       "pattern": "valor_arrastrado",
-      "reason": "Panama casi duplico su poblacion y tuvo uno de los crecimientos economicos mas altos de America Latina, ademas de desarrollar el cafe Geisha como producto de prestigio. Un consumo constante es incompatible con ese contexto."
+      "reason": "Panamá casi duplicó su población y tuvo uno de los crecimientos económicos más altos de América Latina, además de desarrollar el café Geisha como producto de prestigio internacional. Una demanda interna sin evolución es incompatible con ese contexto.",
+      "reason_v1": "Panama casi duplico su poblacion y tuvo uno de los crecimientos economicos mas altos de America Latina, ademas de desarrollar el cafe Geisha como producto de prestigio. Un consumo constante es incompatible con ese contexto."
     },
     {
       "country": "Ecuador",
       "plausible": false,
       "confidence": 0.8,
       "pattern": "valor_arrastrado",
-      "reason": "Ecuador paso de 10 a 17 millones de habitantes y atraveso la crisis y dolarizacion de 1999-2000. La serie muestra una caida escalonada y luego un valor fijo durante casi dos decadas, patron tipico de dato administrativo congelado."
+      "reason": "Ecuador pasó de 10 a 17 millones de habitantes y atravesó la crisis financiera y la dolarización de 1999-2000. La serie desciende por escalones y después se congela, patrón más propio de una estimación administrativa que de una medición.",
+      "reason_v1": "Ecuador paso de 10 a 17 millones de habitantes y atraveso la crisis y dolarizacion de 1999-2000. La serie muestra una caida escalonada y luego un valor fijo durante casi dos decadas, patron tipico de dato administrativo congelado."
     },
     {
       "country": "Malawi",
       "plausible": false,
       "confidence": 0.78,
       "pattern": "valor_arrastrado",
-      "reason": "La poblacion de Malaui se triplico en el periodo. Aunque su consumo de cafe es marginal frente al te, dos unicos valores distintos en treinta anios corresponden a una estimacion fija revisada una sola vez."
+      "reason": "La población de Malaui se triplicó en el periodo. Su consumo de café es marginal frente al té, lo que justifica un nivel bajo, pero no que la estimación se revise una sola vez en tres décadas.",
+      "reason_v1": "La poblacion de Malaui se triplico en el periodo. Aunque su consumo de cafe es marginal frente al te, dos unicos valores distintos en treinta anios corresponden a una estimacion fija revisada una sola vez."
     },
     {
       "country": "Guinea",
       "plausible": false,
       "confidence": 0.75,
       "pattern": "valor_arrastrado",
-      "reason": "Guinea duplico su poblacion y atraveso inestabilidad politica recurrente y el ebola de 2014. Una serie sin variacion sugiere que la cifra se arrastro por falta de reporte al organismo."
+      "reason": "Guinea duplicó su población y atravesó inestabilidad política recurrente y el ébola de 2014. La ausencia de variación sugiere que la cifra se arrastró por falta de reporte al organismo.",
+      "reason_v1": "Guinea duplico su poblacion y atraveso inestabilidad politica recurrente y el ebola de 2014. Una serie sin variacion sugiere que la cifra se arrastro por falta de reporte al organismo."
     },
     {
       "country": "Congo",
       "plausible": false,
       "confidence": 0.75,
       "pattern": "valor_arrastrado",
-      "reason": "La Republica del Congo atraveso guerras civiles en 1993 y 1997 y fuerte dependencia del ciclo petrolero. Un consumo constante de tres mil sacos durante tres decadas es una cifra de referencia, no una medicion."
+      "reason": "La República del Congo atravesó guerras civiles en 1993 y 1997 y depende fuertemente del ciclo petrolero, que marcó su ingreso disponible. Una cifra de consumo que no acusa ninguno de esos movimientos funciona como referencia, no como medición.",
+      "reason_v1": "La Republica del Congo atraveso guerras civiles en 1993 y 1997 y fuerte dependencia del ciclo petrolero. Un consumo constante de tres mil sacos durante tres decadas es una cifra de referencia, no una medicion."
     },
     {
       "country": "Sri Lanka",
       "plausible": false,
       "confidence": 0.75,
       "pattern": "valor_arrastrado",
-      "reason": "Sri Lanka es un pais de te donde el cafe es marginal, lo que explicaria un consumo bajo, pero no uno invariable: la guerra civil termino en 2009 y siguio un periodo de crecimiento y auge turistico que habrian movido la cifra."
+      "reason": "Sri Lanka es un país de té donde el café es marginal, lo que explicaría un consumo bajo pero no uno invariable: la guerra civil terminó en 2009 y siguió un periodo de crecimiento y auge turístico que habrían movido la cifra.",
+      "reason_v1": "Sri Lanka es un pais de te donde el cafe es marginal, lo que explicaria un consumo bajo, pero no uno invariable: la guerra civil termino en 2009 y siguio un periodo de crecimiento y auge turistico que habrian movido la cifra."
     },
     {
       "country": "Cameroon",
       "plausible": false,
       "confidence": 0.75,
       "pattern": "valor_arrastrado",
-      "reason": "Camerun duplico su poblacion y su produccion cafetera cayo sustancialmente tras la liberalizacion de los noventa. La serie se mueve muy poco y en escalones, lo que apunta a revisiones puntuales de una estimacion fija."
+      "reason": "Camerún duplicó su población y su producción cafetera cayó sustancialmente tras la liberalización de los noventa. Que la demanda interna avance por escalones apunta a revisiones puntuales de una estimación fija.",
+      "reason_v1": "Camerun duplico su poblacion y su produccion cafetera cayo sustancialmente tras la liberalizacion de los noventa. La serie se mueve muy poco y en escalones, lo que apunta a revisiones puntuales de una estimacion fija."
     },
     {
       "country": "Trinidad & Tobago",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "valor_arrastrado",
-      "reason": "Es un pais pequenio y de poblacion estable, lo que hace concebible un consumo poco variable, pero atraveso ciclos petroleros marcados que habrian dejado huella. La ausencia casi total de variacion apunta a una cifra arrastrada."
+      "reason": "Es un país pequeño y de población estable, lo que hace concebible un consumo poco variable. Sin embargo atravesó ciclos petroleros marcados que habrían dejado huella en el ingreso disponible, y la serie no los registra.",
+      "reason_v1": "Es un pais pequenio y de poblacion estable, lo que hace concebible un consumo poco variable, pero atraveso ciclos petroleros marcados que habrian dejado huella. La ausencia casi total de variacion apunta a una cifra arrastrada."
     },
     {
       "country": "Ghana",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "valor_arrastrado",
-      "reason": "Ghana es un pais de cacao y te donde el cafe es marginal, y un nivel bajo seria esperable. Sin embargo la poblacion se duplico y el pais alcanzo renta media, de modo que un valor practicamente fijo indica falta de reporte."
+      "reason": "Ghana es un país de cacao y té donde el café es marginal, así que un nivel bajo sería esperable. Pero su población se duplicó y alcanzó la categoría de renta media, de modo que una cifra prácticamente fija indica falta de reporte.",
+      "reason_v1": "Ghana es un pais de cacao y te donde el cafe es marginal, y un nivel bajo seria esperable. Sin embargo la poblacion se duplico y el pais alcanzo renta media, de modo que un valor practicamente fijo indica falta de reporte."
     },
     {
       "country": "Papua New Guinea",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "valor_arrastrado",
-      "reason": "Papua Nueva Guinea es un productor relevante cuya poblacion casi se duplico. Un consumo domestico de dos mil sacos sin variacion a lo largo de tres decadas corresponde a una estimacion nominal."
+      "reason": "Papúa Nueva Guinea es un productor relevante cuya población casi se duplicó. Una demanda interna que no se mueve en ese contexto corresponde a una estimación nominal más que a una medición anual.",
+      "reason_v1": "Papua Nueva Guinea es un productor relevante cuya poblacion casi se duplico. Un consumo domestico de dos mil sacos sin variacion a lo largo de tres decadas corresponde a una estimacion nominal."
     },
     {
       "country": "Lao People's Democratic Republic",
       "plausible": false,
       "confidence": 0.72,
       "pattern": "valor_arrastrado",
-      "reason": "Laos paso de economia cerrada a productor de cafe en expansion en la meseta de Bolaven, con crecimiento economico sostenido desde 2000. La serie, que ademas solo empieza en 2002, muestra escalones planos poco compatibles con esa expansion."
+      "reason": "Laos pasó de economía cerrada a productor de café en expansión en la meseta de Bolaven, con crecimiento económico sostenido desde 2000. Los escalones planos de la serie son poco compatibles con esa apertura.",
+      "reason_v1": "Laos paso de economia cerrada a productor de cafe en expansion en la meseta de Bolaven, con crecimiento economico sostenido desde 2000. La serie, que ademas solo empieza en 2002, muestra escalones planos poco compatibles con esa expansion."
     },
     {
       "country": "Dominican Republic",
       "plausible": false,
       "confidence": 0.75,
       "pattern": "valor_arrastrado",
-      "reason": "La Republica Dominicana tiene cultura cafetera arraigada, su poblacion crecio de 7 a 11 millones y su economia fue de las mas dinamicas de la region. Un consumo con pocas variaciones no refleja ese crecimiento."
+      "reason": "La República Dominicana tiene una cultura cafetera arraigada, su población creció de 7 a 11 millones y su economía fue de las más dinámicas de la región. Una demanda interna con tan poca evolución no refleja ese crecimiento.",
+      "reason_v1": "La Republica Dominicana tiene cultura cafetera arraigada, su poblacion crecio de 7 a 11 millones y su economia fue de las mas dinamicas de la region. Un consumo con pocas variaciones no refleja ese crecimiento."
     },
     {
       "country": "Cuba",
       "plausible": false,
       "confidence": 0.68,
       "pattern": "valor_arrastrado",
-      "reason": "Cuba tiene consumo de cafe muy arraigado y una economia planificada con racionamiento, lo que podria producir cifras administrativamente estables. Pero el Periodo Especial de los noventa implico escasez severa e importaciones de sustitutos, y la serie no lo registra."
+      "reason": "Cuba tiene un consumo de café muy arraigado y una economía planificada con racionamiento, lo que podría producir cifras administrativamente estables. Pero el Período Especial de los noventa implicó escasez severa y sustitución del grano, y la serie no lo registra.",
+      "reason_v1": "Cuba tiene consumo de cafe muy arraigado y una economia planificada con racionamiento, lo que podria producir cifras administrativamente estables. Pero el Periodo Especial de los noventa implico escasez severa e importaciones de sustitutos, y la serie no lo registra."
     },
     {
       "country": "Zambia",
       "plausible": false,
       "confidence": 0.8,
       "pattern": "valor_arrastrado",
-      "reason": "La serie se detiene en 2008 tras casi dos decadas de valores poco variables, justo cuando Zambia atravesaba un ciclo de crecimiento impulsado por el cobre. El corte abrupto indica que el pais dejo de reportar, no que el consumo cesara."
+      "reason": "La serie se interrumpe en 2008, justo cuando Zambia atravesaba un ciclo de crecimiento impulsado por el cobre. Un corte así indica que el país dejó de reportar, no que el consumo cesara.",
+      "reason_v1": "La serie se detiene en 2008 tras casi dos decadas de valores poco variables, justo cuando Zambia atravesaba un ciclo de crecimiento impulsado por el cobre. El corte abrupto indica que el pais dejo de reportar, no que el consumo cesara."
     },
     {
       "country": "Timor-Leste",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "valor_arrastrado",
-      "reason": "Timor Oriental se independizo en 2002 y el cafe es su principal exportacion no petrolera. La serie empieza tarde y presenta un unico valor repetido durante toda su extension, lo que corresponde a una estimacion inicial nunca actualizada."
+      "reason": "Timor Oriental se independizó en 2002 y el café es su principal exportación no petrolera. Que la serie empiece tarde y no se mueva después corresponde a una estimación inicial que nunca se actualizó.",
+      "reason_v1": "Timor Oriental se independizo en 2002 y el cafe es su principal exportacion no petrolera. La serie empieza tarde y presenta un unico valor repetido durante toda su extension, lo que corresponde a una estimacion inicial nunca actualizada."
     },
     {
       "country": "Togo",
       "plausible": false,
       "confidence": 0.62,
       "pattern": "valor_arrastrado",
-      "reason": "Togo es un mercado muy pequenio donde una cifra baja es esperable, pero su poblacion se duplico y atraveso crisis politicas prolongadas. El caracter casi invariable de la serie apunta a dato arrastrado mas que a estabilidad real."
+      "reason": "Togo es un mercado muy pequeño donde una cifra baja resulta esperable, pero su población se duplicó y atravesó crisis políticas prolongadas. La inmovilidad de la cifra apunta a dato arrastrado más que a estabilidad real.",
+      "reason_v1": "Togo es un mercado muy pequenio donde una cifra baja es esperable, pero su poblacion se duplico y atraveso crisis politicas prolongadas. El caracter casi invariable de la serie apunta a dato arrastrado mas que a estabilidad real."
     },
     {
       "country": "Central African Republic",
       "plausible": false,
       "confidence": 0.65,
       "pattern": "indeterminado",
-      "reason": "El pais vivio golpes de estado y una guerra civil desde 2013 que colapsaron su capacidad estadistica. Con esa fragilidad institucional no hay base para afirmar que la serie sea una medicion, pero tampoco para caracterizar con precision el patron."
+      "reason": "El país vivió golpes de estado y una guerra civil desde 2013 que colapsaron su capacidad estadística. Con esa fragilidad institucional no hay base para afirmar que la cifra sea una medición, pero tampoco para caracterizar el patrón con precisión.",
+      "reason_v1": "El pais vivio golpes de estado y una guerra civil desde 2013 que colapsaron su capacidad estadistica. Con esa fragilidad institucional no hay base para afirmar que la serie sea una medicion, pero tampoco para caracterizar con precision el patron."
     },
     {
       "country": "Gabon",
       "plausible": false,
       "confidence": 0.6,
       "pattern": "indeterminado",
-      "reason": "Gabon es un mercado diminuto, de unos quinientos sacos, donde el error de redondeo domina cualquier variacion real. La serie no ofrece base suficiente para distinguir entre estabilidad genuina y dato arrastrado."
+      "reason": "Gabón es un mercado diminuto donde el redondeo domina cualquier variación real, y su economía depende de un ciclo petrolero que no se refleja en la cifra. No hay base suficiente para distinguir estabilidad genuina de dato arrastrado.",
+      "reason_v1": "Gabon es un mercado diminuto, de unos quinientos sacos, donde el error de redondeo domina cualquier variacion real. La serie no ofrece base suficiente para distinguir entre estabilidad genuina y dato arrastrado."
     },
     {
       "country": "Jamaica",
       "plausible": false,
       "confidence": 0.6,
       "pattern": "indeterminado",
-      "reason": "Jamaica exporta casi todo su Blue Mountain y tiene poblacion practicamente estable, de modo que un consumo domestico poco variable es concebible. Aun asi el nivel de invariabilidad observado excede lo que cabria esperar de una medicion anual."
+      "reason": "Jamaica exporta casi todo su Blue Mountain y tiene una población prácticamente estable, de modo que una demanda interna poco variable es concebible. Aun así, el grado de invariabilidad excede lo que cabría esperar de una medición anual.",
+      "reason_v1": "Jamaica exporta casi todo su Blue Mountain y tiene poblacion practicamente estable, de modo que un consumo domestico poco variable es concebible. Aun asi el nivel de invariabilidad observado excede lo que cabria esperar de una medicion anual."
     },
     {
       "country": "Burundi",
       "plausible": false,
       "confidence": 0.68,
       "pattern": "valor_arrastrado",
-      "reason": "Burundi exporta practicamente toda su cosecha y su consumo interno es genuinamente marginal, lo que hace creible un nivel bajo. Pero atraveso una guerra civil de 1993 a 2005 y duplico su poblacion, y la serie no muestra esos efectos."
+      "reason": "Burundi exporta prácticamente toda su cosecha y su consumo interno es genuinamente marginal, lo que hace creíble un nivel bajo. Pero atravesó una guerra civil de 1993 a 2005 y duplicó su población, y la serie no muestra esos efectos.",
+      "reason_v1": "Burundi exporta practicamente toda su cosecha y su consumo interno es genuinamente marginal, lo que hace creible un nivel bajo. Pero atraveso una guerra civil de 1993 a 2005 y duplico su poblacion, y la serie no muestra esos efectos."
     },
     {
       "country": "Yemen",
       "plausible": false,
       "confidence": 0.65,
       "pattern": "indeterminado",
-      "reason": "Yemen es origen historico del cafe y mantiene consumo tradicional arraigado, pero la guerra desde 2015 produjo una de las peores crisis humanitarias del mundo. La serie, que ademas empieza en 2003, no registra ese colapso."
+      "reason": "Yemen es origen histórico del café y mantiene un consumo tradicional arraigado, pero la guerra desde 2015 produjo una de las peores crisis humanitarias del mundo. La serie, que además empieza en 2003, no registra ese colapso.",
+      "reason_v1": "Yemen es origen historico del cafe y mantiene consumo tradicional arraigado, pero la guerra desde 2015 produjo una de las peores crisis humanitarias del mundo. La serie, que ademas empieza en 2003, no registra ese colapso."
     },
     {
       "country": "Guatemala",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "interpolado",
-      "reason": "Guatemala es gran productor, su poblacion paso de 9 a 17 millones y desarrollo consumo interno de especialidad. La serie crece pero en escalones planos prolongados, patron mas propio de una interpolacion entre puntos de referencia que de medicion anual."
+      "reason": "Guatemala es un gran productor, su población pasó de 9 a 17 millones y desarrolló un consumo interno de especialidad. El crecimiento existe pero avanza por tramos planos prolongados, más propio de una interpolación entre puntos de referencia que de una medición anual.",
+      "reason_v1": "Guatemala es gran productor, su poblacion paso de 9 a 17 millones y desarrollo consumo interno de especialidad. La serie crece pero en escalones planos prolongados, patron mas propio de una interpolacion entre puntos de referencia que de medicion anual."
     },
     {
       "country": "Costa Rica",
       "plausible": false,
       "confidence": 0.7,
       "pattern": "interpolado",
-      "reason": "Costa Rica tiene cultura cafetera fuerte y su poblacion crecio de 3 a 5 millones con renta media alta. El crecimiento observado es coherente en direccion, pero avanza en escalones fijos que sugieren interpolacion entre estimaciones puntuales."
+      "reason": "Costa Rica tiene una cultura cafetera fuerte y su población creció de 3 a 5 millones con renta media alta. La dirección del crecimiento es coherente, pero su regularidad sugiere interpolación entre estimaciones puntuales.",
+      "reason_v1": "Costa Rica tiene cultura cafetera fuerte y su poblacion crecio de 3 a 5 millones con renta media alta. El crecimiento observado es coherente en direccion, pero avanza en escalones fijos que sugieren interpolacion entre estimaciones puntuales."
     },
     {
       "country": "Bolivia (Plurinational State of)",
       "plausible": false,
       "confidence": 0.66,
       "pattern": "interpolado",
-      "reason": "Aunque la serie no repite valores, crece en incrementos casi constantes y suaves durante treinta anios, sin un solo retroceso pese a la inestabilidad politica de 2003-2005 y 2019. Esa regularidad es mas propia de una proyeccion que de una medicion."
+      "reason": "El crecimiento es demasiado regular para un país que atravesó la inestabilidad política de 2003-2005 y la crisis de 2019. Esa suavidad es más propia de una proyección que de un mercado observado año a año.",
+      "reason_v1": "Aunque la serie no repite valores, crece en incrementos casi constantes y suaves durante treinta anios, sin un solo retroceso pese a la inestabilidad politica de 2003-2005 y 2019. Esa regularidad es mas propia de una proyeccion que de una medicion."
     },
     {
       "country": "Madagascar",
       "plausible": true,
       "confidence": 0.7,
       "pattern": "medicion_real",
-      "reason": "La serie muestra una caida pronunciada en los noventa y una recuperacion parcial posterior, consistente con el colapso del sector cafetero malgache y con la crisis politica de 2009. La variabilidad es irregular, como cabe esperar de un dato observado."
+      "reason": "La serie recoge el colapso del sector cafetero malgache en los noventa y la crisis política de 2009, con una recuperación parcial posterior. Esa irregularidad es la que cabe esperar de un dato efectivamente observado.",
+      "reason_v1": "La serie muestra una caida pronunciada en los noventa y una recuperacion parcial posterior, consistente con el colapso del sector cafetero malgache y con la crisis politica de 2009. La variabilidad es irregular, como cabe esperar de un dato observado."
     },
     {
       "country": "Tanzania",
       "plausible": true,
       "confidence": 0.75,
       "pattern": "medicion_real",
-      "reason": "Tanzania triplico su poblacion y desarrollo consumo interno desde una base muy baja, con politicas explicitas de promocion del consumo domestico. El crecimiento sostenido y con variaciones irregulares es coherente con esa trayectoria."
+      "reason": "Tanzania triplicó su población y desarrolló consumo interno desde una base muy baja, con políticas explícitas de promoción del café local. El crecimiento observado es coherente con esa trayectoria.",
+      "reason_v1": "Tanzania triplico su poblacion y desarrollo consumo interno desde una base muy baja, con politicas explicitas de promocion del consumo domestico. El crecimiento sostenido y con variaciones irregulares es coherente con esa trayectoria."
     },
     {
       "country": "Thailand",
       "plausible": true,
       "confidence": 0.88,
       "pattern": "medicion_real",
-      "reason": "Tailandia vivio una expansion documentada del consumo de cafe, con crecimiento del cafe instantaneo, cadenas locales y turismo. El aumento sostenido con variacion anual irregular corresponde a un mercado efectivamente medido."
+      "reason": "Tailandia vivió una expansión documentada del consumo de café, impulsada por el café instantáneo, las cadenas locales y el turismo. El aumento sostenido corresponde a un mercado efectivamente medido.",
+      "reason_v1": "Tailandia vivio una expansion documentada del consumo de cafe, con crecimiento del cafe instantaneo, cadenas locales y turismo. El aumento sostenido con variacion anual irregular corresponde a un mercado efectivamente medido."
     },
     {
       "country": "Viet Nam",
       "plausible": true,
       "confidence": 0.95,
       "pattern": "medicion_real",
-      "reason": "Vietnam paso de productor marginal a segundo exportador mundial y desarrollo una cultura de consumo interno fuerte, con cadenas nacionales como Trung Nguyen y Highlands. La multiplicacion del consumo domestico esta ampliamente documentada."
+      "reason": "Vietnam pasó de productor marginal a segundo exportador mundial y desarrolló una cultura de consumo interno fuerte, con cadenas nacionales como Trung Nguyen y Highlands. La expansión de su mercado doméstico está ampliamente documentada.",
+      "reason_v1": "Vietnam paso de productor marginal a segundo exportador mundial y desarrollo una cultura de consumo interno fuerte, con cadenas nacionales como Trung Nguyen y Highlands. La multiplicacion del consumo domestico esta ampliamente documentada."
     },
     {
       "country": "Indonesia",
       "plausible": true,
       "confidence": 0.9,
       "pattern": "medicion_real",
-      "reason": "Indonesia combina poblacion de mas de 250 millones, crecimiento de clase media y una cultura de cafe arraigada que se expandio con cadenas locales desde los 2000. El crecimiento sostenido y variable es plenamente coherente."
+      "reason": "Indonesia combina una población de más de 250 millones, el crecimiento de su clase media y una cultura cafetera arraigada que se expandió con cadenas locales desde los 2000. El aumento del consumo interno es plenamente coherente.",
+      "reason_v1": "Indonesia combina poblacion de mas de 250 millones, crecimiento de clase media y una cultura de cafe arraigada que se expandio con cadenas locales desde los 2000. El crecimiento sostenido y variable es plenamente coherente."
     },
     {
       "country": "Philippines",
       "plausible": true,
       "confidence": 0.88,
       "pattern": "medicion_real",
-      "reason": "Filipinas tiene uno de los mayores mercados de cafe soluble del mundo y su poblacion paso de 61 a 108 millones, con fuerte urbanizacion. El crecimiento observado es proporcionado a ese contexto."
+      "reason": "Filipinas tiene uno de los mayores mercados de café soluble del mundo y su población pasó de 61 a 108 millones, con una urbanización intensa. El crecimiento observado es proporcionado a ese contexto.",
+      "reason_v1": "Filipinas tiene uno de los mayores mercados de cafe soluble del mundo y su poblacion paso de 61 a 108 millones, con fuerte urbanizacion. El crecimiento observado es proporcionado a ese contexto."
     },
     {
       "country": "India",
       "plausible": true,
       "confidence": 0.85,
       "pattern": "medicion_real",
-      "reason": "Aunque India es predominantemente consumidora de te, el sur del pais tiene tradicion cafetera y las cadenas urbanas se expandieron notablemente desde los 2000. Un crecimiento moderado y con variacion anual es lo esperable."
+      "reason": "Aunque India es predominantemente consumidora de té, el sur del país tiene tradición cafetera y las cadenas urbanas se expandieron notablemente desde los 2000. Un crecimiento moderado es lo esperable.",
+      "reason_v1": "Aunque India es predominantemente consumidora de te, el sur del pais tiene tradicion cafetera y las cadenas urbanas se expandieron notablemente desde los 2000. Un crecimiento moderado y con variacion anual es lo esperable."
     },
     {
       "country": "Brazil",
       "plausible": true,
       "confidence": 0.95,
       "pattern": "medicion_real",
-      "reason": "Brasil es el mayor productor y el segundo consumidor mundial, con estadisticas cafeteras solidas y campanas sostenidas de promocion del consumo interno. El crecimiento continuo y con variaciones anuales es exactamente lo documentado."
+      "reason": "Brasil es el mayor productor y el segundo consumidor mundial, con estadísticas cafeteras sólidas y campañas sostenidas de promoción del consumo interno. Su expansión continua es exactamente lo documentado.",
+      "reason_v1": "Brasil es el mayor productor y el segundo consumidor mundial, con estadisticas cafeteras solidas y campanas sostenidas de promocion del consumo interno. El crecimiento continuo y con variaciones anuales es exactamente lo documentado."
     },
     {
       "country": "Ethiopia",
       "plausible": true,
       "confidence": 0.93,
       "pattern": "medicion_real",
-      "reason": "Etiopia es origen del cafe y consume internamente cerca de la mitad de su produccion, con la ceremonia del cafe como practica cotidiana. Su poblacion paso de 48 a 112 millones, lo que explica el fuerte crecimiento observado."
+      "reason": "Etiopía es el origen del café y consume internamente cerca de la mitad de su producción, con la ceremonia del café como práctica cotidiana. Su población pasó de 48 a 112 millones, lo que explica el fuerte crecimiento de la demanda interna.",
+      "reason_v1": "Etiopia es origen del cafe y consume internamente cerca de la mitad de su produccion, con la ceremonia del cafe como practica cotidiana. Su poblacion paso de 48 a 112 millones, lo que explica el fuerte crecimiento observado."
     },
     {
       "country": "Colombia",
       "plausible": true,
       "confidence": 0.88,
       "pattern": "medicion_real",
-      "reason": "Colombia dispone de estadisticas cafeteras detalladas a traves de la Federacion Nacional de Cafeteros. La serie crece de forma leve e irregular, coherente con un mercado maduro y con las campanas de promocion del consumo interno."
+      "reason": "Colombia dispone de estadísticas cafeteras detalladas a través de la Federación Nacional de Cafeteros. Un crecimiento leve e irregular es coherente con un mercado maduro y con las campañas de promoción del consumo interno.",
+      "reason_v1": "Colombia dispone de estadisticas cafeteras detalladas a traves de la Federacion Nacional de Cafeteros. La serie crece de forma leve e irregular, coherente con un mercado maduro y con las campanas de promocion del consumo interno."
     },
     {
       "country": "Mexico",
       "plausible": true,
       "confidence": 0.85,
       "pattern": "medicion_real",
-      "reason": "Mexico paso de 84 a 126 millones de habitantes con expansion de cafeterias urbanas y del cafe soluble. El crecimiento sostenido con variabilidad anual corresponde a un mercado grande y efectivamente medido."
+      "reason": "México pasó de 84 a 126 millones de habitantes, con expansión de las cafeterías urbanas y del café soluble. El crecimiento sostenido corresponde a un mercado grande y efectivamente medido.",
+      "reason_v1": "Mexico paso de 84 a 126 millones de habitantes con expansion de cafeterias urbanas y del cafe soluble. El crecimiento sostenido con variabilidad anual corresponde a un mercado grande y efectivamente medido."
     },
     {
       "country": "Venezuela",
       "plausible": true,
       "confidence": 0.75,
       "pattern": "medicion_real",
-      "reason": "Venezuela tiene consumo de cafe muy arraigado, y la serie muestra la variabilidad esperable de un pais que vivio auge petrolero y luego un colapso economico severo desde 2014. La irregularidad respalda que se trate de dato observado."
+      "reason": "Venezuela tiene un consumo de café muy arraigado, y su serie refleja lo esperable de un país que vivió un auge petrolero y luego un colapso económico severo desde 2014. Esa irregularidad respalda que se trate de dato observado.",
+      "reason_v1": "Venezuela tiene consumo de cafe muy arraigado, y la serie muestra la variabilidad esperable de un pais que vivio auge petrolero y luego un colapso economico severo desde 2014. La irregularidad respalda que se trate de dato observado."
     },
     {
       "country": "Honduras",
       "plausible": true,
       "confidence": 0.8,
       "pattern": "medicion_real",
-      "reason": "Honduras se convirtio en el mayor productor centroamericano durante el periodo y su poblacion casi se duplico. El crecimiento del consumo interno con variacion anual es consistente con esa expansion."
+      "reason": "Honduras se convirtió en el mayor productor centroamericano durante el periodo y su población casi se duplicó. El crecimiento del consumo interno es consistente con esa expansión.",
+      "reason_v1": "Honduras se convirtio en el mayor productor centroamericano durante el periodo y su poblacion casi se duplico. El crecimiento del consumo interno con variacion anual es consistente con esa expansion."
     },
     {
       "country": "El Salvador",
       "plausible": true,
       "confidence": 0.75,
       "pattern": "medicion_real",
-      "reason": "El Salvador tiene tradicion cafetera y su serie presenta variaciones irregulares compatibles con la posguerra, la dolarizacion de 2001 y el fuerte peso de las remesas en el consumo de los hogares."
+      "reason": "El Salvador tiene tradición cafetera, y su serie es compatible con la posguerra, la dolarización de 2001 y el fuerte peso de las remesas en el consumo de los hogares.",
+      "reason_v1": "El Salvador tiene tradicion cafetera y su serie presenta variaciones irregulares compatibles con la posguerra, la dolarizacion de 2001 y el fuerte peso de las remesas en el consumo de los hogares."
     },
     {
       "country": "Nicaragua",
       "plausible": true,
       "confidence": 0.78,
       "pattern": "medicion_real",
-      "reason": "Nicaragua crecio como productor y su poblacion paso de 4 a 6.5 millones, con recuperacion economica sostenida tras los noventa. El aumento continuo y con variacion anual es coherente con ese contexto."
+      "reason": "Nicaragua creció como productor y su población pasó de 4 a 6.5 millones, con una recuperación económica sostenida tras los noventa. El aumento del consumo interno es coherente con ese contexto.",
+      "reason_v1": "Nicaragua crecio como productor y su poblacion paso de 4 a 6.5 millones, con recuperacion economica sostenida tras los noventa. El aumento continuo y con variacion anual es coherente con ese contexto."
     },
     {
       "country": "Uganda",
       "plausible": true,
       "confidence": 0.8,
       "pattern": "medicion_real",
-      "reason": "Uganda es el mayor exportador africano de cafe y su poblacion paso de 17 a 44 millones. Aunque es un pais tradicionalmente de te, existen politicas explicitas de promocion del consumo interno, coherentes con el crecimiento observado."
+      "reason": "Uganda es el mayor exportador africano de café y su población pasó de 17 a 44 millones. Aunque es un país tradicionalmente de té, existen políticas explícitas de promoción del consumo interno, coherentes con lo observado.",
+      "reason_v1": "Uganda es el mayor exportador africano de cafe y su poblacion paso de 17 a 44 millones. Aunque es un pais tradicionalmente de te, existen politicas explicitas de promocion del consumo interno, coherentes con el crecimiento observado."
     },
     {
       "country": "Guyana",
       "plausible": true,
       "confidence": 0.62,
       "pattern": "medicion_real",
-      "reason": "Guyana es un mercado muy pequenio con poblacion estancada, lo que limita cuanto se puede inferir. Aun asi la serie presenta variaciones irregulares, incluidas caidas, que son mas propias de un dato observado que de una estimacion fija."
+      "reason": "Guyana es un mercado muy pequeño con población estancada, lo que limita cuánto se puede inferir. Aun así, su serie se mueve de forma irregular, más propia de un dato observado que de una estimación fija.",
+      "reason_v1": "Guyana es un mercado muy pequenio con poblacion estancada, lo que limita cuanto se puede inferir. Aun asi la serie presenta variaciones irregulares, incluidas caidas, que son mas propias de un dato observado que de una estimacion fija."
     }
   ]
 }
