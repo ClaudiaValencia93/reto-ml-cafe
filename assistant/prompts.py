@@ -55,9 +55,16 @@ texto adicional, sin explicación previa y sin bloques de código:
 
 {schema}
 
-El campo "reason" debe citar el hecho concreto del mundo que sustenta el \
-juicio, no describir la serie. "El consumo no varía" describe; "la población \
-del país casi se duplicó en ese periodo" sustenta.\
+Sobre el campo "reason":
+
+- Debe citar el hecho concreto del mundo que sustenta el juicio, no describir \
+la serie. "El consumo no varía" describe; "la población del país casi se \
+duplicó en ese periodo" sustenta.
+- Escríbelo en español correcto, con tildes y eñes: "años", no "anios"; \
+"población", no "poblacion".
+- Si citas una cifra sobre la serie —cuántos años seguidos repite un valor, \
+cuántos valores distintos tiene— cuéntala y dala exacta. No escribas "casi \
+veinte años" ni "alrededor de"; si no la has contado, no la cites.\
 """
 
 

@@ -652,9 +652,13 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       var confBaja = vivo.confidence <= 0.7 || d.fx.n <= 0.7;
       var partes = [];
 
+      // OJO: los dos prompts NO son iguales. El grabado (assistant/prompts.py)
+      // admite justificaciones de hasta 600 caracteres; el de esta pagina las
+      // limita a 180 y ademas exige cifras exactas. Atribuir la diferencia al
+      // azar del modelo seria una explicacion falsa.
       partes.push(coincide
-        ? "Las dos corridas coinciden en el veredicto."
-        : "<strong>Las dos corridas discrepan.</strong> Es la misma pregunta hecha en dos momentos: un modelo de lenguaje no es una función pura, así que el mismo prompt puede dar juicios distintos.");
+        ? "Las dos corridas coinciden en el veredicto, pese a partir de prompts distintos."
+        : "<strong>Las dos corridas discrepan.</strong> No son la misma pregunta: la grabada usa el prompt de <span class=\"mono\">assistant/prompts.py</span>, que admite justificaciones de hasta 600 caracteres; esta página las limita a 180 y además exige cifras exactas. Prompts distintos producen juicios distintos, y un modelo tampoco está obligado a repetirse.");
 
       if (d.q === "parcial") {
         // Los 'parcial' no entran en NINGUNA metrica: ni precision ni calibracion.
@@ -718,42 +722,50 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 
     function construyePrompt(d) {
       var lineas = [
-        "Eres un auditor de calidad de datos especializado en estadisticas agricolas internacionales.",
-        "Evaluas series historicas de consumo domestico de cafe reportadas por los paises a la",
-        "International Coffee Organization.",
+        "Eres un auditor de calidad de datos especializado en estadísticas agrícolas",
+        "internacionales. Evalúas series históricas de consumo doméstico de café reportadas",
+        "por los países a la International Coffee Organization.",
         "",
-        "Decide si el comportamiento de la serie es COMPATIBLE con lo que se sabe del pais en ese",
-        "periodo: su poblacion, su economia, su cultura de consumo y su papel en el mercado del cafe.",
+        "Decide si el comportamiento de la serie es COMPATIBLE con lo que se sabe del país en",
+        "ese periodo: su población, su economía, su cultura de consumo y su papel en el",
+        "mercado del café.",
         "",
         "Criterios:",
-        "- Un valor identico repetido muchos anios seguidos casi nunca es una medicion. Suele indicar",
-        "  que el pais dejo de reportar y el organismo repitio el ultimo dato conocido.",
-        "- Variaciones en escalones perfectamente regulares sugieren interpolacion.",
-        "- Una serie plana PUEDE ser legitima en un pais muy pequenio y estable.",
-        "- Si el pais es pequenio o esta poco documentado y no tienes base solida para juzgar, dilo:",
-        '  usa el patron "indeterminado" y una confianza baja, en vez de inventar una justificacion.',
+        "- Un valor idéntico repetido muchos años seguidos casi nunca es una medición. Suele",
+        "  indicar que el país dejó de reportar y el organismo repitió el último dato conocido.",
+        "- Variaciones en escalones perfectamente regulares sugieren interpolación.",
+        "- Una serie plana PUEDE ser legítima en un país muy pequeño y estable.",
+        "- Si el país es pequeño o está poco documentado y no tienes base sólida para juzgar,",
+        '  dilo: usa el patrón "indeterminado" y una confianza baja, en vez de inventar una',
+        "  justificación.",
         "",
         "FORMATO DE RESPUESTA",
-        "Responde con un unico objeto JSON y NADA MAS: sin texto antes, sin texto despues,",
-        "sin bloque de codigo. Exactamente esta forma, en una sola linea:",
+        "Responde con un único objeto JSON y NADA MÁS: sin texto antes, sin texto después,",
+        "sin bloque de código. Exactamente esta forma, en una sola línea:",
         "",
-        '{"plausible": false, "confidence": 0.9, "pattern": "valor_arrastrado", "reason": "La poblacion casi se duplico en el periodo."}',
+        '{"plausible": false, "confidence": 0.9, "pattern": "valor_arrastrado", "reason": "La población casi se duplicó en el periodo."}',
         "",
         "plausible  = true o false",
-        "confidence = numero entre 0 y 1",
+        "confidence = número entre 0 y 1",
         "pattern    = exactamente una de estas cuatro palabras:",
         "             medicion_real | valor_arrastrado | interpolado | indeterminado",
-        "reason     = UNA sola frase en espanol, de MAXIMO 180 CARACTERES, que cite el hecho",
+        "reason     = UNA sola frase en español, de MÁXIMO 180 CARACTERES, que cite el hecho",
         "             concreto del mundo que sustenta el juicio. No describas la serie:",
-        "             sustentala. Se breve: una respuesta larga se corta y se pierde.",
+        "             sustentala. Sé breve: una respuesta larga se corta y se pierde.",
         "",
-        "Pais: " + d.c,
-        "Tipo de cafe predominante: " + d.t,
+        "Dos reglas sobre cómo escribir la justificación:",
+        "- Español correcto, con tildes y eñes: \"años\", no \"anios\".",
+        "- Si citas una cifra sobre la serie (cuántos años seguidos repite un valor, cuántos",
+        "  valores distintos tiene), cuéntala y dala EXACTA. Nada de \"casi veinte años\" ni",
+        "  \"alrededor de\": si no la has contado, no la cites.",
+        "",
+        "País: " + d.c,
+        "Tipo de café predominante: " + d.t,
         "Periodo: " + d.y0 + "-" + (d.y0 + d.v.length - 1) + " (" + d.v.length + " observaciones)",
-        "Consumo domestico anual, en sacos de 60 kg:",
+        "Consumo doméstico anual, en sacos de 60 kg:",
         d.v.map(function (v, i) { return (d.y0 + i) + ": " + v; }).join(", "),
         "",
-        "Es plausible esta serie para " + d.c + "?"
+        "¿Es plausible esta serie para " + d.c + "?"
       ];
       return lineas.join("\n");
     }
