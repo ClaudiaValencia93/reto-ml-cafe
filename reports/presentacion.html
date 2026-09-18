@@ -155,6 +155,47 @@ tr.hl td:first-child{font-weight:600}
 .gloss dt{font-family:"IBM Plex Mono",monospace; font-size:.82rem; color:var(--ink); font-weight:500; margin:0}
 .gloss dd{margin:0; font-size:.86rem; color:var(--ink-2); line-height:1.45}
 
+/* ---- dictamenes del auditor: la salida real del modelo ---- */
+.code{
+  background:var(--surface); border:1px solid var(--line); border-radius:3px;
+  padding:14px 16px; overflow-x:auto; margin:0;
+  font-family:"IBM Plex Mono",monospace; font-size:.78rem; line-height:1.65;
+  color:var(--ink-2); white-space:pre;
+}
+.code .k{color:var(--muted)}
+.code .v{color:var(--green)}
+.code .s{color:var(--ink)}
+
+.verdicts{display:flex; flex-direction:column; gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.v-i{background:var(--surface); padding:15px 17px; display:grid;
+  grid-template-columns:150px 1fr; gap:6px 18px; align-items:start}
+.v-c{font-weight:600; font-size:.95rem}
+.v-tags{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:5px}
+.tag{font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.05em;
+  padding:2px 7px; border-radius:2px; white-space:nowrap}
+.tag.no{background:var(--clay-soft); color:var(--clay)}
+.tag.si{background:var(--green-soft); color:var(--green)}
+.tag.p{background:var(--paper); color:var(--muted); border:1px solid var(--line)}
+.v-r{font-size:.89rem; color:var(--ink-2); line-height:1.5; grid-column:2}
+.v-i.miss{background:var(--clay-soft)}
+
+@media (max-width:620px){
+  .v-i{grid-template-columns:1fr; gap:8px}
+  .v-r{grid-column:1}
+}
+
+/* ---- matriz de confusion ---- */
+.cm{display:grid; grid-template-columns:auto 1fr 1fr; gap:1px; background:var(--line);
+  border:1px solid var(--line); border-radius:3px; overflow:hidden; max-width:430px}
+.cm > *{background:var(--surface); padding:11px 13px; font-size:.84rem}
+.cm .hd{font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted)}
+.cm .cell{font-family:"IBM Plex Mono",monospace; font-size:1.25rem; text-align:center}
+.cm .cell.good{color:var(--green); background:var(--green-soft)}
+.cm .cell.bad{color:var(--clay); background:var(--clay-soft)}
+.cm .cell.zero{color:var(--muted)}
+
 /* ---- callout ---- */
 .note{border-left:3px solid var(--green); padding:2px 0 2px 18px; color:var(--ink-2); max-width:64ch}
 .note.warn{border-left-color:var(--clay)}
@@ -437,11 +478,60 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 
   <p class="body">Un modelo de lenguaje recibe la serie cruda —<strong>nunca la métrica de calidad</strong>, para que la evaluación no sea circular— y emite un dictamen estructurado que después se mide contra el detector determinista.</p>
 
+  <h3>Lo que el modelo devuelve</h3>
+  <pre class="code"><span class="k">{</span>
+  <span class="k">"plausible"</span>:  <span class="v">false</span><span class="k">,</span>
+  <span class="k">"confidence"</span>: <span class="v">0.92</span><span class="k">,</span>
+  <span class="k">"pattern"</span>:    <span class="s">"valor_arrastrado"</span><span class="k">,</span>
+  <span class="k">"reason"</span>:     <span class="s">"La población de Kenia pasó de 23 a 52</span>
+                <span class="s">millones entre 1990 y 2019…"</span>
+<span class="k">}</span></pre>
+  <p class="body">Cada respuesta se valida contra un esquema antes de usarse. Una confianza expresada como “alta” en vez de un número, o un patrón fuera del vocabulario, se rechaza y se registra — nunca se interpreta a medias.</p>
+
+  <h3>Dictámenes reales sobre cinco países</h3>
+  <div class="verdicts">
+    <div class="v-i">
+      <div><span class="v-c">Kenia</span>
+        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,92</span></div></div>
+      <p class="v-r">La población pasó de unos 23 a 52 millones entre 1990 y 2019, con fuerte urbanización y aparición de cadenas de cafeterías desde los 2000. Un consumo idéntico durante 23 años consecutivos es incompatible con ese cambio.</p>
+    </div>
+    <div class="v-i">
+      <div><span class="v-c">Vietnam</span>
+        <div class="v-tags"><span class="tag si">plausible</span><span class="tag p">conf 0,95</span></div></div>
+      <p class="v-r">Pasó de productor marginal a segundo exportador mundial y desarrolló una cultura de consumo interno fuerte, con cadenas nacionales como Trung Nguyen y Highlands. La multiplicación del consumo doméstico está ampliamente documentada.</p>
+    </div>
+    <div class="v-i">
+      <div><span class="v-c">Cuba</span>
+        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,68</span></div></div>
+      <p class="v-r">Tiene consumo muy arraigado y una economía planificada con racionamiento, lo que <em>podría</em> producir cifras administrativamente estables. Pero el Período Especial de los noventa implicó escasez severa, y la serie no lo registra.</p>
+    </div>
+    <div class="v-i">
+      <div><span class="v-c">Gabón</span>
+        <div class="v-tags"><span class="tag p">indeterminado</span><span class="tag p">conf 0,60</span></div></div>
+      <p class="v-r">Es un mercado diminuto, de unos quinientos sacos, donde el error de redondeo domina cualquier variación real. La serie no ofrece base suficiente para distinguir entre estabilidad genuina y dato repetido.</p>
+    </div>
+    <div class="v-i miss">
+      <div><span class="v-c">Bolivia</span>
+        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,66</span><span class="tag no">error</span></div></div>
+      <p class="v-r">Crece en incrementos casi constantes durante treinta años, “sin un solo retroceso”. <strong>La verificación desmiente esa afirmación:</strong> hay una caída de 240.000 kg en 2005.</p>
+    </div>
+  </div>
+  <p class="body">Gabón es el caso instructivo del lado bueno: ante un mercado del que no tiene información fiable, el modelo declara que no puede juzgar en vez de inventar una justificación.</p>
+
+  <h3>La medición</h3>
+  <div class="cm">
+    <span class="hd"></span><span class="hd">Auditor: problema</span><span class="hd">Auditor: correcto</span>
+    <span class="hd">Real: repetido</span><span class="cell good">21</span><span class="cell zero">0</span>
+    <span class="hd">Real: medido</span><span class="cell bad">1</span><span class="cell good">17</span>
+  </div>
+
   <div class="figs">
     <div class="fig pos"><span class="n">100%</span><span class="k">recall: encontró los 21 problemas reales</span></div>
     <div class="fig pos"><span class="n">95,5%</span><span class="k">precisión</span></div>
-    <div class="fig"><span class="n">1</span><span class="k">falso positivo en 39 países</span></div>
+    <div class="fig"><span class="n">86%</span><span class="k">acierto cuando declara confianza baja, frente a 100% en las bandas altas</span></div>
   </div>
+
+  <p class="body">Esa última cifra importa: el auditor <strong>acierta más cuando dice estar más seguro</strong>. La confianza declarada sirve para priorizar qué revisar a mano, no es decorativa.</p>
 
   <div class="note warn">
     <span class="h">El falso positivo importa más que el acierto</span>
