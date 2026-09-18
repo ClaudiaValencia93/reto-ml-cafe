@@ -895,35 +895,47 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   })();
   </script>
 
-  <h3>Dictámenes reales sobre cinco países</h3>
-  <div class="verdicts">
-    <div class="v-i">
-      <div><span class="v-c">Kenia</span>
-        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,92</span></div></div>
-      <p class="v-r">La población pasó de unos 23 a 52 millones entre 1990 y 2019, con fuerte urbanización y aparición de cadenas de cafeterías desde los 2000. Un consumo idéntico durante 23 años consecutivos es incompatible con ese cambio.</p>
-    </div>
-    <div class="v-i">
-      <div><span class="v-c">Vietnam</span>
-        <div class="v-tags"><span class="tag si">plausible</span><span class="tag p">conf 0,95</span></div></div>
-      <p class="v-r">Pasó de productor marginal a segundo exportador mundial y desarrolló una cultura de consumo interno fuerte, con cadenas nacionales como Trung Nguyen y Highlands. La multiplicación del consumo doméstico está ampliamente documentada.</p>
-    </div>
-    <div class="v-i">
-      <div><span class="v-c">Cuba</span>
-        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,68</span></div></div>
-      <p class="v-r">Tiene consumo muy arraigado y una economía planificada con racionamiento, lo que <em>podría</em> producir cifras administrativamente estables. Pero el Período Especial de los noventa implicó escasez severa, y la serie no lo registra.</p>
-    </div>
-    <div class="v-i">
-      <div><span class="v-c">Gabón</span>
-        <div class="v-tags"><span class="tag p">indeterminado</span><span class="tag p">conf 0,60</span></div></div>
-      <p class="v-r">Es un mercado diminuto, de unos quinientos sacos, donde el error de redondeo domina cualquier variación real. La serie no ofrece base suficiente para distinguir entre estabilidad genuina y dato repetido.</p>
-    </div>
-    <div class="v-i miss">
-      <div><span class="v-c">Bolivia</span>
-        <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,66</span><span class="tag no">error</span></div></div>
-      <p class="v-r">El crecimiento es demasiado regular para un país que atravesó inestabilidad política en 2003-2005 y 2019. <strong>El bloque calculado, al lado, registra una caída en 2005</strong>: la evidencia contra el veredicto queda a la vista.</p>
-    </div>
-  </div>
-  <p class="body">Gabón es el caso instructivo del lado bueno: ante un mercado del que no tiene información fiable, el modelo declara que no puede juzgar en vez de inventar una justificación.</p>
+  <h3>Cinco dictámenes, elegidos por lo que enseñan</h3>
+  <div class="verdicts" id="destacados"></div>
+  <p class="body">Gabón es el caso instructivo del lado bueno: ante un mercado del que no tiene información fiable, el modelo declara que no puede juzgar en vez de inventar una justificación. Bolivia es el contrario, y aparece marcado.</p>
+
+  <script>
+  (function () {
+    var D = window.__PAISES || [];
+    var cont = document.getElementById("destacados");
+    if (!cont || !D.length) return;
+
+    // Elegidos por el caso que ilustran, no por su resultado.
+    var SEL = [
+      ["Kenya", "", "el acierto claro"],
+      ["Viet Nam", "", "una serie legítima reconocida"],
+      ["Cuba", "", "razonamiento matizado"],
+      ["Gabon", "", "el modelo admite que no sabe"],
+      ["Bolivia (Plurinational State of)", "miss", "el único error"]
+    ];
+
+    function esc(t) {
+      var e = document.createElement("span");
+      e.textContent = String(t);
+      return e.innerHTML;
+    }
+
+    cont.innerHTML = SEL.map(function (p) {
+      var d = D.filter(function (x) { return x.c === p[0]; })[0];
+      if (!d) return "";
+      var ok = d.fx.p === true;
+      return '<div class="v-i ' + p[1] + '">' +
+        '<div><span class="v-c">' + esc(d.c.replace(" (Plurinational State of)", "")) + '</span>' +
+          '<div class="v-tags"><span class="tag ' + (ok ? "si" : "no") + '">' +
+            (ok ? "plausible" : "no plausible") + '</span>' +
+            '<span class="tag p">conf ' + d.fx.n.toFixed(2) + '</span></div>' +
+          '<span class="vpat">' + esc(p[2]) + '</span></div>' +
+        '<div><div class="src"><span class="lb2">Calculado</span><p>' + esc(d.cf) + '</p></div>' +
+        '<div class="src"><span class="lb2">Del modelo</span><p>' + esc(d.fx.r) + '</p></div></div>' +
+        '</div>';
+    }).join("");
+  })();
+  </script>
 
   <h3>La medición</h3>
   <p class="body">Sobre los <strong>39 países</strong> que el detector clasifica sin ambigüedad. Los 14 de la banda <em>parcial</em> no entran en ninguna métrica: no hay veredicto contra el cual contrastar.</p>
