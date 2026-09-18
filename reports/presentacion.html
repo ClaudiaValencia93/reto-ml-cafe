@@ -234,6 +234,10 @@ button.ghost{background:transparent; color:var(--muted); border:1px solid var(--
   text-transform:uppercase; color:var(--muted); display:block; margin-bottom:4px}
 .truth .vl{font-size:.9rem; color:var(--ink)}
 
+.cmp{font-size:.88rem; line-height:1.5; border-left:3px solid var(--green);
+  padding:3px 0 3px 15px; color:var(--ink-2); margin:0}
+.cmp.dis{border-left-color:var(--clay)}
+
 /* ---- callout ---- */
 .note{border-left:3px solid var(--green); padding:2px 0 2px 18px; color:var(--ink-2); max-width:64ch}
 .note.warn{border-left-color:var(--clay)}
@@ -547,8 +551,9 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       <div class="truth" id="truth" hidden>
         <div><span class="lb">Detector determinista</span><span class="vl" id="t-q"></span></div>
         <div><span class="lb">Años sin variación</span><span class="vl" id="t-f"></span></div>
-        <div><span class="lb">Dictamen grabado</span><span class="vl" id="t-x"></span></div>
+        <div><span class="lb">Corrida grabada · otro momento</span><span class="vl" id="t-x"></span></div>
       </div>
+      <p class="cmp" id="cmp" hidden></p>
     </div>
   </div>
   <p class="body">Lo que corre aquí es el mismo prompt de <span class="mono">assistant/prompts.py</span>. Cada respuesta se valida contra el esquema antes de mostrarse: si el modelo devuelve una confianza como «alta», o un patrón fuera del vocabulario, se rechaza en vez de interpretarse a medias.</p>
@@ -560,6 +565,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     var sel = document.getElementById("pais"), run = document.getElementById("run"),
         stop = document.getElementById("stop"), out = document.getElementById("out"),
         truth = document.getElementById("truth"), serie = document.getElementById("serie"),
+        cmp = document.getElementById("cmp"),
         sparkp = document.getElementById("sparkp");
 
     D.forEach(function (d, i) {
@@ -587,17 +593,41 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
         return (d.y0 + i) + ": " + v.toLocaleString("es");
       }).join("  ·  ");
       truth.hidden = true;
+      cmp.hidden = true;
       out.innerHTML = '<p class="wait">Pulse <strong>Auditar</strong> para que el modelo juzgue esta serie.</p>';
     }
     sel.addEventListener("change", pinta);
     pinta();
 
-    function revela(d) {
+    function revela(d, vivo) {
       document.getElementById("t-q").textContent = d.q;
       document.getElementById("t-f").textContent = d.f + "%";
       document.getElementById("t-x").textContent =
         (d.fx.p ? "plausible" : "no plausible") + " · " + d.fx.t + " · conf " + d.fx.n;
       truth.hidden = false;
+
+      // Interpretar la comparacion. Un desacuerdo entre la corrida en vivo y la
+      // grabada no es un fallo del codigo: un LLM no es una funcion pura, y por
+      // eso el proyecto mide la calibracion en vez de confiar en un dictamen.
+      var coincide = vivo.plausible === d.fx.p;
+      var confBaja = vivo.confidence < 0.7 || d.fx.n < 0.7;
+      var partes = [];
+
+      partes.push(coincide
+        ? "Las dos corridas coinciden en el veredicto."
+        : "<strong>Las dos corridas discrepan.</strong> Es la misma pregunta hecha en dos momentos: un modelo de lenguaje no es una función pura, así que el mismo prompt puede dar juicios distintos.");
+
+      if (d.q === "parcial") {
+        partes.push("Este país cae en la banda <strong>parcial</strong> del detector: ni claramente medido ni claramente repetido. Queda fuera del cálculo de precisión precisamente porque no hay veredicto contra el cual medir.");
+      }
+
+      if (confBaja) {
+        partes.push("Ambos dictámenes declaran confianza por debajo de 0,70, la banda donde el auditor acierta el <strong>86%</strong> de las veces frente al 100% de las bandas altas. La confianza baja está avisando de esto.");
+      }
+
+      cmp.innerHTML = partes.join(" ");
+      cmp.className = coincide ? "cmp ok" : "cmp dis";
+      cmp.hidden = false;
     }
 
     function tarjeta(v) {
@@ -646,12 +676,19 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
         "- Si el pais es pequenio o esta poco documentado y no tienes base solida para juzgar, dilo:",
         '  usa el patron "indeterminado" y una confianza baja, en vez de inventar una justificacion.',
         "",
-        "Responde UNICAMENTE con un objeto JSON con estas cuatro claves:",
-        '  "plausible": true o false',
-        '  "confidence": numero entre 0 y 1',
-        '  "pattern": uno de ' + JSON.stringify(PAT),
-        '  "reason": una o dos frases en espanol, citando el hecho concreto del mundo que',
-        "            sustenta el juicio (no describas la serie: sustentala)",
+        "FORMATO DE RESPUESTA",
+        "Responde con un unico objeto JSON y NADA MAS: sin texto antes, sin texto despues,",
+        "sin bloque de codigo. Exactamente esta forma, en una sola linea:",
+        "",
+        '{"plausible": false, "confidence": 0.9, "pattern": "valor_arrastrado", "reason": "La poblacion casi se duplico en el periodo."}',
+        "",
+        "plausible  = true o false",
+        "confidence = numero entre 0 y 1",
+        "pattern    = exactamente una de estas cuatro palabras:",
+        "             medicion_real | valor_arrastrado | interpolado | indeterminado",
+        "reason     = UNA sola frase en espanol, de MAXIMO 180 CARACTERES, que cite el hecho",
+        "             concreto del mundo que sustenta el juicio. No describas la serie:",
+        "             sustentala. Se breve: una respuesta larga se corta y se pierde.",
         "",
         "Pais: " + d.c,
         "Tipo de cafe predominante: " + d.t,
@@ -680,6 +717,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
         run.disabled = true;
         stop.hidden = false;
         truth.hidden = true;
+        cmp.hidden = true;
         out.innerHTML = '<p class="wait">Consultando a Claude…</p>';
 
         sample.json(construyePrompt(d), {
@@ -696,13 +734,25 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
             out.innerHTML = '<p class="err">Respuesta rechazada por el validador: ' + err + '</p>';
           } else {
             out.innerHTML = tarjeta(v);
-            revela(d);
+            revela(d, v);
           }
         }, function (e) {
           var msg = Object.prototype.hasOwnProperty.call(COPIA, e.code)
             ? COPIA[e.code] : "No se pudo completar la consulta.";
           out.innerHTML = msg ? '<p class="err">' + esc(msg) + '</p>'
                               : '<p class="wait">Consulta detenida.</p>';
+          // Mostrar lo que llego de verdad: un fallo opaco no se puede diagnosticar.
+          if (e.text) {
+            var pre = document.createElement("p");
+            pre.className = "raw";
+            var t = e.text.trim();
+            var cortada = e.code === "invalid_json" && t.charAt(0) === "{"
+                          && t.charAt(t.length - 1) !== "}";
+            pre.textContent = (cortada
+              ? "La respuesta se cortó antes de cerrar el JSON:\n"
+              : "Respuesta recibida:\n") + t.slice(0, 700);
+            out.appendChild(pre);
+          }
           if (e.code === "not_granted" || e.code === "sampling_disabled"
               || e.code === "not_declared") {
             run.disabled = true;
