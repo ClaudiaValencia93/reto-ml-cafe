@@ -657,17 +657,28 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
         : "<strong>Las dos corridas discrepan.</strong> Es la misma pregunta hecha en dos momentos: un modelo de lenguaje no es una función pura, así que el mismo prompt puede dar juicios distintos.");
 
       if (d.q === "parcial") {
-        partes.push("Este país cae en la banda <strong>parcial</strong> del detector: ni claramente medido ni claramente repetido. Queda fuera del cálculo de precisión precisamente porque no hay veredicto contra el cual medir.");
-      }
-
-      if (confBaja) {
+        // Los 'parcial' no entran en NINGUNA metrica: ni precision ni calibracion.
+        // Citarles el 86% seria aplicarles una cifra calculada sin ellos.
+        partes.push(
+          "Este país queda <strong>fuera de la evaluación</strong>. El detector lo clasifica " +
+          "como <strong>parcial</strong>: ni claramente medido ni claramente repetido, así que " +
+          "no hay veredicto contra el cual contrastar al auditor. No cuenta en la precisión del " +
+          "95,5% ni en la tabla de calibración — en la lista de los 53 de abajo aparece como " +
+          "«sin veredicto».");
+        if (confBaja) {
+          partes.push(
+            "Las confianzas declaradas (<strong>" + vivo.confidence.toFixed(2) +
+            "</strong> y <strong>" + d.fx.n + "</strong>) son coherentes con esa ambigüedad: " +
+            "el modelo tampoco lo tiene claro.");
+        }
+      } else if (confBaja) {
         partes.push(
           "Ojo con las dos cifras, que miden cosas distintas. <strong>" +
           vivo.confidence.toFixed(2) + "</strong> y <strong>" + d.fx.n +
           "</strong> son la confianza que el modelo se asigna a sí mismo en cada dictamen. " +
-          "El <strong>86%</strong> es acierto verificado: de los 7 dictámenes con confianza " +
-          "de 0,70 o menos, 6 resultaron correctos al contrastarlos con el detector " +
-          "determinista, frente al 100% de las bandas altas. Que el acierto medido baje cuando " +
+          "El <strong>86%</strong> es acierto verificado sobre otro conjunto: de los 7 países " +
+          "evaluados cuyo dictamen grabado tuvo confianza de 0,70 o menos, 6 resultaron " +
+          "correctos, frente al 100% de las bandas altas. Que el acierto medido baje cuando " +
           "baja la confianza declarada es lo que hace utilizable este componente.");
       }
 
@@ -847,6 +858,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   <p class="body">Gabón es el caso instructivo del lado bueno: ante un mercado del que no tiene información fiable, el modelo declara que no puede juzgar en vez de inventar una justificación.</p>
 
   <h3>La medición</h3>
+  <p class="body">Sobre los <strong>39 países</strong> que el detector clasifica sin ambigüedad. Los 14 de la banda <em>parcial</em> no entran en ninguna métrica: no hay veredicto contra el cual contrastar.</p>
   <div class="cm">
     <span class="hd"></span><span class="hd">Auditor: problema</span><span class="hd">Auditor: correcto</span>
     <span class="hd">Real: repetido</span><span class="cell good">21</span><span class="cell zero">0</span>
@@ -943,11 +955,10 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     pinta();
   })();
   </script>
-
   <div class="figs">
     <div class="fig pos"><span class="n">100%</span><span class="k">recall: encontró los 21 problemas reales</span></div>
     <div class="fig pos"><span class="n">95,5%</span><span class="k">precisión</span></div>
-    <div class="fig"><span class="n">86%</span><span class="k">acierto verificado en la banda de confianza declarada baja, frente a 100% en las altas</span></div>
+    <div class="fig"><span class="n">86%</span><span class="k">acierto verificado en la banda de confianza baja: 6 de 7 países evaluados. Las bandas altas, 100%</span></div>
   </div>
 
   <p class="body">Esa última cifra mide dos cosas a la vez, y conviene no confundirlas. La <em>confianza</em> es lo que el modelo se asigna a sí mismo en cada dictamen; el <em>acierto</em> es cuántos resultaron correctos al contrastarlos con el detector determinista. Que el segundo caiga al 86% justo donde el primero baja significa que el auditor <strong>sabe cuándo no sabe</strong>: la confianza declarada sirve para priorizar qué revisar a mano, y no es decorativa.</p>
