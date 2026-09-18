@@ -70,6 +70,14 @@ python src/coffee/price_forecast.py   # pronóstico de precios con intervalos
 python -m assistant.auditor     # auditor de plausibilidad + su evaluación
 ```
 
+La presentación (`reports/presentacion.html`) lleva los datos incrustados para
+funcionar sin red. Las pruebas detectan si quedan desfasados respecto al dataset;
+para regenerarlos:
+
+```bash
+python scripts/sync_presentacion.py
+```
+
 Los datos de precios ya están versionados en `data/raw/`. Para actualizarlos:
 
 ```bash
