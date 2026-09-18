@@ -285,6 +285,8 @@ button.ghost{background:transparent; color:var(--muted); border:1px solid var(--
 .vreason .lb2{margin-top:9px}
 .vreason .lb2:first-child{margin-top:0}
 
+th.c2,td.c2{text-align:center; width:130px}
+
 /* ---- callout ---- */
 .note{border-left:3px solid var(--green); padding:2px 0 2px 18px; color:var(--ink-2); max-width:64ch}
 .note.warn{border-left-color:var(--clay)}
@@ -316,7 +318,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
   <p class="eyebrow">Reto técnico · Ingeniería de machine learning</p>
   <h1>Café: dónde crece la demanda y qué precio esperar</h1>
   <p class="lede">Análisis del consumo doméstico de café en 55 países entre 1990 y 2019, con proyección de rangos de precio internacional hasta 2029. Preparado para <strong>High Garden Coffee</strong>, exportadora internacional.</p>
-  <p class="meta"><span>55 países · 30 años cafeteros</span><span>96 pruebas automatizadas</span><span>Fuentes: ICO · FMI</span></p>
+  <p class="meta"><span>55 países · 30 años cafeteros</span><span>131 pruebas automatizadas</span><span>Fuentes: ICO · FMI</span></p>
 </section>
 
 <section class="stack">
@@ -567,6 +569,24 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 
   <p class="body">Un modelo de lenguaje recibe la serie cruda —<strong>nunca la métrica de calidad</strong>, para que la evaluación no sea circular— y emite un dictamen estructurado que después se mide contra el detector determinista.</p>
 
+  <h3>El reparto de territorios</h3>
+  <p class="body">La primera versión dejaba que el modelo describiera también la serie, y ahí falló: tres de sus justificaciones afirmaban cifras que los datos desmienten. <strong>Un modelo de lenguaje no cuenta: recuerda.</strong> La corrección no fue pedirle más cuidado, sino quitarle esa tarea.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Territorio</th><th>Quién lo produce</th><th class="c2">¿Puede fallar?</th></tr></thead>
+      <tbody>
+        <tr><td>Cuántos años repite un valor, cuántos distintos, cuántas caídas</td><td><span class="mono">series_facts.py</span></td><td class="c2">No</td></tr>
+        <tr><td>Que la población de Kenia pasó de 23 a 52 millones</td><td>El modelo</td><td class="c2">Sí, y se declara</td></tr>
+        <tr><td>El juicio: plausible o no</td><td>El modelo</td><td class="c2">Sí, por eso se mide</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="body">El prompt prohíbe citar cifras de la serie y el validador <strong>rechaza</strong> el dictamen que lo haga, igual que rechaza una confianza fuera de rango. Los hechos calculados no van en el prompt: se producen <em>después</em> del juicio, porque la racha de valores idénticos es, con otro nombre, la misma señal del detector contra el que se le mide.</p>
+
+  <p class="body">Las 22 afirmaciones cuantitativas sobre población se contrastaron después contra la serie <span class="mono">SP.POP.TOTL</span> del Banco Mundial. Catorce resistieron con error inferior al 8%; cuatro multiplicadores se corrigieron.</p>
+
   <h3>Lo que el modelo devuelve</h3>
   <pre class="code"><span class="k">{</span>
   <span class="k">"plausible"</span>:  <span class="v">false</span><span class="k">,</span>
@@ -603,7 +623,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       <p class="cmp" id="cmp" hidden></p>
     </div>
   </div>
-  <p class="body">Lo que corre aquí es el mismo prompt de <span class="mono">assistant/prompts.py</span>. Cada respuesta se valida contra el esquema antes de mostrarse: si el modelo devuelve una confianza como «alta», o un patrón fuera del vocabulario, se rechaza en vez de interpretarse a medias.</p>
+  <p class="body">Lo que corre aquí es el mismo prompt de <span class="mono">assistant/prompts.py</span>, con el reparto descrito arriba: el bloque <strong>Calculado</strong> lo produce el código y es incontestable; el bloque <strong>Del modelo</strong> viene de su memoria y se declara como tal.</p>
 
   <script>
   (function () {
@@ -878,7 +898,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     <div class="v-i miss">
       <div><span class="v-c">Bolivia</span>
         <div class="v-tags"><span class="tag no">no plausible</span><span class="tag p">conf 0,66</span><span class="tag no">error</span></div></div>
-      <p class="v-r">Crece en incrementos casi constantes durante treinta años, “sin un solo retroceso”. <strong>La verificación desmiente esa afirmación:</strong> hay una caída de 240.000 kg en 2005.</p>
+      <p class="v-r">El crecimiento es demasiado regular para un país que atravesó inestabilidad política en 2003-2005 y 2019. <strong>El bloque calculado, al lado, registra una caída en 2005</strong>: la evidencia contra el veredicto queda a la vista.</p>
     </div>
   </div>
   <p class="body">Gabón es el caso instructivo del lado bueno: ante un mercado del que no tiene información fiable, el modelo declara que no puede juzgar en vez de inventar una justificación.</p>
@@ -993,9 +1013,11 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
 
   <div class="note warn">
     <span class="h">El falso positivo importa más que el acierto</span>
-    El auditor marcó Bolivia como interpolada argumentando que la serie crece “sin un solo retroceso”. La verificación muestra una caída de 240.000 kg en 2005: <strong>el argumento contiene un hecho falso</strong>. Su segundo argumento tampoco distingue nada — Brasil, Etiopía e Indonesia comparten la misma regularidad y son los mercados mejor medidos del panel.
+    El auditor marca Bolivia como interpolada por la regularidad de su crecimiento. Junto al dictamen, el bloque calculado registra <strong>una caída en 2005</strong>: la evidencia que debilita el veredicto aparece en la misma tarjeta, sin que nadie la señale.
     <br><br>
-    El dictamen se lee como un análisis experto y es incorrecto. Sin la capa de evaluación habría pasado como válido. <strong>El auditor genera candidatos para revisión humana, no veredictos autónomos.</strong>
+    Su otro indicio —incrementos en múltiplos regulares— tampoco distingue nada: Brasil, Etiopía e Indonesia los tienen igual, y son los mercados mejor medidos del panel.
+    <br><br>
+    En la primera versión este dictamen se sustentaba además en una afirmación falsa, que el modelo escribió con total aplomo. Ese error motivó el reparto de territorios. <strong>El auditor genera candidatos para revisión humana, no veredictos autónomos.</strong>
   </div>
 </section>
 
