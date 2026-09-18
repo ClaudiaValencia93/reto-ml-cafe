@@ -15,7 +15,8 @@
     "withholding_rationale": "Entregar el detector determinista al modelo haria que lo repitiera, y la evaluacion posterior mediria copia en vez de juicio. El modelo solo ve la serie cruda y el nombre del pais.",
     "n_countries": 53,
     "note": "Dictamenes generados por Claude Opus 5 y grabados como golden fixture. La ruta --live llama a la API y esta verificada hasta el control de saldo de la cuenta.",
-    "revision": "v2 reparte territorios: el codigo describe la serie (series_facts.py) y el modelo aporta solo el hecho del mundo. Las justificaciones se reescribieron sin cifras de serie y con ortografia correcta; el texto original de cada una se conserva en 'reason_v1'. NINGUN veredicto cambio -plausible, pattern y confidence son los de v1-, de modo que precision, recall y calibracion son identicas. La v1 contenia tres afirmaciones sobre la serie que los datos desmienten; en v2 ese tipo de afirmacion esta prohibido por el prompt y rechazado por el validador de schema.py."
+    "revision": "v2 reparte territorios: el codigo describe la serie (series_facts.py) y el modelo aporta solo el hecho del mundo. Las justificaciones se reescribieron sin cifras de serie y con ortografia correcta; el texto original de cada una se conserva en 'reason_v1'. NINGUN veredicto cambio -plausible, pattern y confidence son los de v1-, de modo que precision, recall y calibracion son identicas. La v1 contenia tres afirmaciones sobre la serie que los datos desmienten; en v2 ese tipo de afirmacion esta prohibido por el prompt y rechazado por el validador de schema.py.",
+    "fact_check": "Las 22 afirmaciones cuantitativas sobre poblacion se contrastaron contra la serie SP.POP.TOTL del Banco Mundial (snapshot en data/raw/). Las 14 cifras explicitas resistieron con error inferior al 8%. Cuatro multiplicadores se corrigieron: Tanzania y Malawi decian 'triplico' con factores reales de 2.27x y 1.99x; Papua Nueva Guinea y Honduras decian 'casi duplico' subestimando factores de 2.47x y 2.00x. Ningun veredicto cambio."
   },
   "verdicts": [
     {
@@ -135,7 +136,7 @@
       "plausible": false,
       "confidence": 0.78,
       "pattern": "valor_arrastrado",
-      "reason": "La población de Malaui se triplicó en el periodo. Su consumo de café es marginal frente al té, lo que justifica un nivel bajo, pero no que la estimación se revise una sola vez en tres décadas.",
+      "reason": "La población de Malaui se duplicó en el periodo. Su consumo de café es marginal frente al té, lo que justifica un nivel bajo, pero no que la estimación se revise una sola vez en tres décadas.",
       "reason_v1": "La poblacion de Malaui se triplico en el periodo. Aunque su consumo de cafe es marginal frente al te, dos unicos valores distintos en treinta anios corresponden a una estimacion fija revisada una sola vez."
     },
     {
@@ -191,7 +192,7 @@
       "plausible": false,
       "confidence": 0.7,
       "pattern": "valor_arrastrado",
-      "reason": "Papúa Nueva Guinea es un productor relevante cuya población casi se duplicó. Una demanda interna que no se mueve en ese contexto corresponde a una estimación nominal más que a una medición anual.",
+      "reason": "Papúa Nueva Guinea es un productor relevante cuya población se multiplicó por dos y medio. Una demanda interna que no se mueve en ese contexto corresponde a una estimación nominal más que a una medición anual.",
       "reason_v1": "Papua Nueva Guinea es un productor relevante cuya poblacion casi se duplico. Un consumo domestico de dos mil sacos sin variacion a lo largo de tres decadas corresponde a una estimacion nominal."
     },
     {
@@ -319,7 +320,7 @@
       "plausible": true,
       "confidence": 0.75,
       "pattern": "medicion_real",
-      "reason": "Tanzania triplicó su población y desarrolló consumo interno desde una base muy baja, con políticas explícitas de promoción del café local. El crecimiento observado es coherente con esa trayectoria.",
+      "reason": "Tanzania más que duplicó su población y desarrolló consumo interno desde una base muy baja, con políticas explícitas de promoción del café local. El crecimiento observado es coherente con esa trayectoria.",
       "reason_v1": "Tanzania triplico su poblacion y desarrollo consumo interno desde una base muy baja, con politicas explicitas de promocion del consumo domestico. El crecimiento sostenido y con variaciones irregulares es coherente con esa trayectoria."
     },
     {
@@ -407,7 +408,7 @@
       "plausible": true,
       "confidence": 0.8,
       "pattern": "medicion_real",
-      "reason": "Honduras se convirtió en el mayor productor centroamericano durante el periodo y su población casi se duplicó. El crecimiento del consumo interno es consistente con esa expansión.",
+      "reason": "Honduras se convirtió en el mayor productor centroamericano durante el periodo y su población se duplicó. El crecimiento del consumo interno es consistente con esa expansión.",
       "reason_v1": "Honduras se convirtio en el mayor productor centroamericano durante el periodo y su poblacion casi se duplico. El crecimiento del consumo interno con variacion anual es consistente con esa expansion."
     },
     {

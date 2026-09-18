@@ -41,7 +41,7 @@ puntual falló por ~40% y en una sola dirección: no anticipó el shock de ofert
 |---|---|
 | Análisis de la información | [`notebooks/01_eda.ipynb`](notebooks/01_eda.ipynb) |
 | Solución a las problemáticas de negocio | [`02_modelado`](notebooks/02_modelado.ipynb) y [`03_precios`](notebooks/03_precios.ipynb) |
-| Implementación y evaluación | [`src/coffee/`](src/coffee/) + 126 pruebas en [`tests/`](tests/) |
+| Implementación y evaluación | [`src/coffee/`](src/coffee/) + 131 pruebas en [`tests/`](tests/) |
 | Presentación de resultados | Este README y los notebooks ejecutados |
 | **BONUS — IA generativa** | [`assistant/`](assistant/): auditor de plausibilidad, implementado y medido |
 
@@ -62,7 +62,7 @@ La instalación editable (`-e`) registra el paquete `coffee` en el entorno, de m
 notebooks, pruebas y aplicaciones lo importan sin manipular `sys.path`.
 
 ```bash
-pytest                          # 126 pruebas, ~35 s
+pytest                          # 131 pruebas, ~35 s
 python src/coffee/data.py       # carga y limpieza + reporte de calidad
 python src/coffee/prices.py     # precios anuales por tipo de café
 python src/coffee/evaluate.py   # backtesting completo (~8 min)
@@ -105,7 +105,7 @@ notebooks/
     02_modelado.ipynb  comparación de modelos y la paradoja de composición
     03_precios.ipynb   rangos de precios futuros
 
-tests/                 126 pruebas sobre limpieza, métricas, modelos y auditor
+tests/                 131 pruebas sobre limpieza, métricas, modelos y auditor
 data/raw/              dataset original y series de precios, sin modificar
 reports/figures/       11 figuras generadas por los notebooks
 ```
@@ -411,9 +411,11 @@ No se ejecutó contra la API por no disponer de créditos.
    modelo ajustado. Con 30 observaciones anuales y dos series crecientes, cualquier
    regresión produciría una correlación alta y espuria.
 5. **El auditor razona desde memoria, no desde verificación.** Sus afirmaciones
-   sobre el mundo —cifras de población, fechas de conflictos— provienen del
-   entrenamiento del modelo y no están contrastadas contra ninguna fuente. Las
-   cifras de la serie sí son incontestables, porque las calcula el código.
+   sobre el mundo provienen del entrenamiento del modelo, no de una consulta.
+   Las 22 afirmaciones cuantitativas sobre población **sí** se contrastaron
+   contra la serie SP.POP.TOTL del Banco Mundial (ver `tests/test_fact_check.py`)
+   y cuatro se corrigieron. Las cualitativas —fechas de conflictos, cambios
+   culturales— no están verificadas contra fuente.
 
 ---
 
