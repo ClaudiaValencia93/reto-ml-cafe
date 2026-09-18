@@ -8,6 +8,10 @@ __pycache__/
 # datos derivados (los crudos si se versionan)
 data/processed/*
 !data/processed/.gitkeep
+# estos dos si se versionan: 168 KB que permiten correr las pruebas de
+# verificacion sin esperar los 8 minutos del pipeline completo
+!data/processed/backtest_consumo.parquet
+!data/processed/plausibility_audit.parquet
 
 # artefactos
 models/*.pkl
