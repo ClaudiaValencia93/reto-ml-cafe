@@ -27,3 +27,6 @@ desktop.ini
 
 # cache de pytest (se autoignora, pero se declara para que sea evidente)
 .pytest_cache/
+
+# el comprimido de entrega se genera, no se versiona
+*.zip
