@@ -173,7 +173,7 @@ nivel.
 
 Cada país tiene como máximo 30 observaciones anuales. La decisión no se sustenta en una
 referencia sino en el backtesting: se implementó el enfoque de machine learning más
-razonable disponible —un LightGBM **global**, entrenado sobre los 43 países a la vez
+razonable disponible —un LightGBM **global**, entrenado sobre los 42 países a la vez
 (~1,290 observaciones) y sobre tasas de crecimiento logarítmicas para que Brasil y
 Burundi sean comparables, que es la arquitectura ganadora de la competencia M5— y
 obtuvo MASE 1.89 contra 0.76 de una recta ajustada por dos puntos.
@@ -192,7 +192,9 @@ fuga de información: entregaría al modelo el agregado del futuro.
 **Origen móvil, no partición aleatoria.** Partir una serie temporal al azar entrena con
 el futuro para predecir el pasado. El protocolo fija un año de corte, entrena solo con
 lo anterior y predice los tres años siguientes; luego el corte avanza. Resultado: 13
-orígenes × 43 países × 6 modelos = 3,156 evaluaciones.
+orígenes sobre 42 países × 6 modelos = 3,156 evaluaciones. Dos países no
+alcanzan los 13 cortes porque su historia no cubre los 15 años de entrenamiento
+que exige el primero.
 
 **MASE como métrica principal.** El consumo va de 1.2e5 (Burundi) a 1.3e9 (Brasil). El
 MAPE castiga desproporcionadamente los valores pequeños y no permite promediar entre

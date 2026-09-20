@@ -461,7 +461,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
       <text class="lbl" x="20" y="244">global y esconden que, donde hay medición real, el naive queda cuarto de cinco.</text>
       <text class="lbl" x="20" y="272">Barra más corta = menor error. La línea punteada marca al modelo trivial.</text>
     </svg>
-    <figcaption>Evaluación con origen móvil: 13 cortes temporales × 43 países × 6 modelos = 3.156 pronósticos, cada uno entrenado solo con datos anteriores al año predicho.</figcaption>
+    <figcaption>Evaluación con origen móvil: 3.156 pronósticos sobre 42 países y 13 cortes temporales, cada uno entrenado solo con datos anteriores al año predicho. Dos países no alcanzan los 13 cortes: su historia no llega a los 15 años de entrenamiento que exige el primero.</figcaption>
   </figure>
 
   <dl class="gloss">
@@ -469,12 +469,12 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green); outline-of
     <div><dt>drift</dt><dd>Extiende la tendencia media de toda la serie hacia adelante.</dd></div>
     <div><dt>arima</dt><dd>Modela la inercia: cuánto arrastra cada año al siguiente.</dd></div>
     <div><dt>ets</dt><dd>Pondera más los años recientes, con la tendencia amortiguada.</dd></div>
-    <div><dt>lightgbm</dt><dd>Machine learning entrenado sobre los 43 países a la vez.</dd></div>
+    <div><dt>lightgbm</dt><dd>Machine learning entrenado sobre los 42 países a la vez.</dd></div>
   </dl>
 
   <div class="note">
     <span class="h">Por qué no se usó deep learning</span>
-    Cada país aporta como máximo 30 observaciones anuales. Se implementó el enfoque de machine learning más razonable disponible —un modelo global tipo LightGBM entrenado sobre los 43 países a la vez, sobre tasas de crecimiento logarítmicas— y quedó en <span class="mono">1,89</span> frente a <span class="mono">0,76</span> de una recta ajustada por dos puntos. La decisión se sustenta en medición, no en preferencia.
+    Cada país aporta como máximo 30 observaciones anuales. Se implementó el enfoque de machine learning más razonable disponible —un modelo global tipo LightGBM entrenado sobre los 42 países a la vez, sobre tasas de crecimiento logarítmicas— y quedó en <span class="mono">1,89</span> frente a <span class="mono">0,76</span> de una recta ajustada por dos puntos. La decisión se sustenta en medición, no en preferencia.
   </div>
 </section>
 
